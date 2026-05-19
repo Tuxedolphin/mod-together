@@ -1,4 +1,8 @@
 <script lang="ts">
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
+	
 	import { SvelteDate } from "svelte/reactivity";
 
 	const currentDay = new Date().getDay();
