@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      js-search:
+        specifier: ^2.0.1
+        version: 2.0.1
     devDependencies:
       '@eslint/compat':
         specifier: ^2.0.4
@@ -35,6 +39,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.2.2
         version: 4.3.0(vite@8.0.13(@types/node@24.12.4)(jiti@2.7.0))
+      '@types/js-search':
+        specifier: ^1.4.4
+        version: 1.4.4
       '@types/node':
         specifier: ^24
         version: 24.12.4
@@ -470,6 +477,9 @@ packages:
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
+  '@types/js-search@1.4.4':
+    resolution: {integrity: sha512-NYIBuSRTi2h6nLne0Ygx78BZaiT/q0lLU7YSkjOrDJWpSx6BioIZA/i2GZ+WmMUzEQs2VNIWcXRRAqisrG3ZNA==}
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -851,6 +861,9 @@ packages:
   jiti@2.7.0:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
+
+  js-search@2.0.1:
+    resolution: {integrity: sha512-8k12LiC3fPt7gLRJTc1azE1BFvlxIw+BG3J9YzjuYf4wSE65uqYSYP4VhweApcTfV51Fzq/ogBulQew5937A9A==}
 
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
@@ -1709,6 +1722,8 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
+  '@types/js-search@1.4.4': {}
+
   '@types/json-schema@7.0.15': {}
 
   '@types/node@24.12.4':
@@ -2123,6 +2138,8 @@ snapshots:
   isexe@2.0.0: {}
 
   jiti@2.7.0: {}
+
+  js-search@2.0.1: {}
 
   json-buffer@3.0.1: {}
 

@@ -1,11 +1,10 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-
 	let { data }: PageProps = $props();
 	
-	import { SvelteDate } from "svelte/reactivity";
+	import SearchBar from '../components/SearchBar.svelte';
 
-	const currentDay = new Date().getDay();
+	// const currentDay = new Date().getDay();
 	// Get Localised Sunday to Sat:
 	const daysOfWeek = [
 		new Date('25 Jan 2026'), // Sunday
@@ -30,13 +29,16 @@
 		return dateFormatter.format(date);
 	}
 
-    const dateTimeToSet = new SvelteDate('25 Jan 2026');
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
+    const dateTimeToSet = new Date('25 Jan 2026');
 
     function formatShortTime(hour: number): string {
         return timeFormatter.format(dateTimeToSet.setHours(hour, 0, 0, 0))
     }
+
 </script>
 
+<SearchBar summaries={data.data}></SearchBar>
 <div class="flex">
 	<div class="row-auto w-12 flex-initial">
         <div class="h-16"></div>
