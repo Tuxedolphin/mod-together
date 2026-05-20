@@ -1,7 +1,7 @@
 <script lang="ts">
-  import TimetableComponent from '../components/TimetableComponent.svelte';
+	import TimetableComponent from '../components/TimetableComponent.svelte';
 
-	import DaysOfWeekHeader from './DaysOfWeekHeader.svelte';
+	import DaysOfWeekHeader from '../components/DaysOfWeekHeader.svelte';
 
 	import Timeline from '../components/Timeline.svelte';
 	import SearchBar from '../components/SearchBar.svelte';
