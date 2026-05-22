@@ -3,7 +3,7 @@
 
 	import { onMount } from 'svelte';
 	import { currentlySelectedMods } from '../shared/shared.svelte';
-	import { getFullModInfo } from '../utils/fetchFromCache';
+	import { getFullModInfo } from '../utils/fetch_from_cache';
 
 	import type { Module } from '../types/modules';
 

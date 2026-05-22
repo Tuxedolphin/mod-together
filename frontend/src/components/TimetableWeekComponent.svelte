@@ -3,7 +3,8 @@
 
 	import type { Module, RawLesson } from '../types/modules';
 	import { currentlySelectedMods } from '../shared/shared.svelte';
-		import type { TimeTableDayInfo } from '../types/internal';
+	import type { TimeTableDayInfo } from '../types/internal';
+	import { normaliseDuration } from '../utils/calculations_for_ui';
 
 	interface WeekTimeTabledComponent {
 		day: number;
@@ -11,9 +12,15 @@
 	}
 	const { day, modInfo }: WeekTimeTabledComponent = $props();
 	const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-	const filteredInformation: TimeTableDayInfo[] = $derived(filterByDay(modInfo));
+	const filteredInformation: TimeTableDayInfo[] = $derived(
+		calculateOverlappingTimes(filterByDay(modInfo))
+	);
 
-	function filterByDay(modInfo: { [moduleCode: string]: Module }): any[] {
+	function calculateOverlappingTimes(timeTableInfo: TimeTableDayInfo[]): TimeTableDayInfo[] {
+		return timeTableInfo;
+	}
+
+	function filterByDay(modInfo: { [moduleCode: string]: Module }): TimeTableDayInfo[] {
 		let totalInfo: TimeTableDayInfo[] = [];
 		for (const mod in modInfo) {
 			const info = modInfo[mod];
@@ -35,7 +42,9 @@
 					totalInfo.push({
 						lessonSchedule: lesson,
 						moduleCode: info.moduleCode,
-						moduleName: info.title
+						moduleName: info.title,
+						normalisedStartDuration: normaliseDuration('0800', '2000', lesson.startTime),
+						normalisedEndDuration: normaliseDuration('0800', '2000', lesson.endTime)
 					});
 				}
 			}
@@ -51,6 +60,8 @@
 			lessonSchedule={mod.lessonSchedule}
 			moduleCode={mod.moduleCode}
 			moduleName={mod.moduleName}
+			normalisedStartDuration={mod.normalisedStartDuration}
+			normalisedEndDuration={mod.normalisedEndDuration}
 		></TimetableDayComponent>
 	{/each}
 </div>
