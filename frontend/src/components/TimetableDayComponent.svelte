@@ -9,16 +9,28 @@
 		normalisedStartDuration,
 		normalisedEndDuration,
 		isAChoiceSelection,
-		groupIndex,
-		groupLength
+		innerGroupIndex,
+		innerGroupLength,
+		outerGroupIndex,
+		outerGroupLength,
+		uniqueIdentifer
 	}: TimeTableDayInfo = $props();
+
+	const spaceAllowedToUse = $derived(100.0 / outerGroupLength);
+	const startingOuterOffset = $derived(outerGroupIndex * spaceAllowedToUse);
+	const leftMarginPercentage = $derived(
+		innerGroupIndex * (spaceAllowedToUse / innerGroupLength) + startingOuterOffset
+	);
+
+	const width = $derived(spaceAllowedToUse / innerGroupLength);
 </script>
 
 <button
-	style="margin-left: {groupIndex * (100.0 / groupLength)}%;"
+	style:margin-left="{leftMarginPercentage}%"
+	style:width="{width}%;"
 	class="absolute
 	{isAChoiceSelection ? 'opacity-30' : 'opacity-100'}
-	mt-{normalisedStartDuration * 192} w-1/{groupLength} h-{normalisedEndDuration * 192 -
+	mt-{normalisedStartDuration * 192} h-{normalisedEndDuration * 192 -
 		normalisedStartDuration * 192} border bg-primary-content text-xs wrap-break-word"
 	onclick={() => {
 		if (chooseModState.lessonType === '') {
@@ -34,5 +46,6 @@
 		}
 	}}
 >
-	{moduleCode} - {moduleName} - {lessonSchedule.lessonType} [{lessonSchedule.classNo}]
+	{moduleCode}
+	{lessonSchedule.lessonType} [{lessonSchedule.classNo}]
 </button>

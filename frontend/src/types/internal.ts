@@ -8,7 +8,8 @@ export interface TimeTableDayInfo {
 	normalisedEndDuration: number;
 	isAChoiceSelection: boolean;
 	uniqueIdentifer: string;
-	hasFoundAGroup: boolean;
-	groupLength: number;
-	groupIndex: number;
+	outerGroupIndex: number;
+	outerGroupLength: number;
+	innerGroupIndex: number;
+	innerGroupLength: number;
 }

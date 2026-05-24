@@ -18,14 +18,13 @@
 	);
 
 	function findOverlappingTimeInfoNew(allTime: TimeTableDayInfo[]) {
-		
-		const groupTimes = Object.groupBy(allTime, (x => x.normalisedStartDuration));
+		const groupTimes = Object.groupBy(allTime, (x) => x.normalisedStartDuration);
 		const MAX_ITER = 1000;
-		let iterIdx = 0;		
+		let iterIdx = 0;
 		const processedTimings: string[] = [];
 		const processedGroups: {
-			[key: number] : TimeTableDayInfo[][]
-		} = {}
+			[key: number]: TimeTableDayInfo[][];
+		} = {};
 		let lengthOfGroups = 0;
 		for (const _ in groupTimes) lengthOfGroups++;
 		let groupId = 0;
@@ -33,104 +32,60 @@
 			iterIdx++;
 			console.log(groupId);
 			let firstGroup: TimeTableDayInfo[] = null;
-			let firstGroupProcess: string = "";
+			let firstGroupProcess: string = '';
 			for (const i in groupTimes) {
 				if (processedTimings.includes(i)) continue;
 				firstGroup = groupTimes[i]!;
 				firstGroupProcess = i;
-				firstGroup.sort((a, b) => (b.normalisedEndDuration - b.normalisedStartDuration) - (a.normalisedEndDuration - a.normalisedStartDuration)); 
-				
+				firstGroup.sort(
+					(a, b) =>
+						b.normalisedEndDuration -
+						b.normalisedStartDuration -
+						(a.normalisedEndDuration - a.normalisedStartDuration)
+				);
+
 				processedTimings.push(i);
-				
+
 				if (!processedGroups[groupId]) processedGroups[groupId] = [];
-				processedGroups[groupId].push(firstGroup)
+				processedGroups[groupId].push(firstGroup);
 				break;
 			}
 
 			let endTime = firstGroup[0].normalisedEndDuration;
 
-			// Find groups: 
+			// Find groups:
 			for (const i in groupTimes) {
 				if (i == firstGroupProcess) continue;
 				const group = groupTimes[i]![0];
-				if (group.normalisedStartDuration == endTime) 
-				{
+				if (group.normalisedStartDuration == endTime) {
 					endTime = group.normalisedEndDuration;
 					processedTimings.push(i);
-					processedGroups[groupId].push(groupTimes[i]!)
-				}				
+					processedGroups[groupId].push(groupTimes[i]!);
+				}
 			}
 
 			groupId++;
-		} 
+		}
 
-		
+		const outerGroupLength = Object.keys(processedGroups).length;
+
+		for (const group in processedGroups) {
+			const outerGroupIdx = Number.parseInt(group);
+
+			for (const lessonGrouping of processedGroups[group]) {
+				const innerGroupLength = lessonGrouping.length;
+				for (let i = 0; i < lessonGrouping.length; i++) {
+					const lesson = lessonGrouping[i];
+					lesson.outerGroupIndex = outerGroupIdx;
+					lesson.outerGroupLength = outerGroupLength;
+					lesson.innerGroupLength = innerGroupLength;
+					lesson.innerGroupIndex = i;
+				}
+			}
+		}
+
 		if (iterIdx == MAX_ITER) {
-			console.log("Unable to find pairings");
-		}
-	}
-
-	function findOverlappingTimeInfo(allTimes: TimeTableDayInfo[]) {
-		let groupsFound = 0;
-		let timeOut = 0;
-		let timeOutLimit = 10_000;
-		let groupTimes = [];
-
-		while (groupsFound != allTimes.length && timeOut != timeOutLimit) {
-			for (const item of allTimes) {
-				if (item.hasFoundAGroup) continue;
-				if (!item.hasFoundAGroup) {
-					// try to match a group:
-					for (const times of groupTimes) {
-						const groupStartTime = times['startTime'];
-						const groupEndTime = times['endTime'];
-						const groupMembers = times['members'];
-
-						// match group: add member:
-						if (
-							item.normalisedStartDuration >= groupStartTime &&
-							item.normalisedEndDuration <= groupEndTime
-						) {
-							groupMembers.push(item.uniqueIdentifer);
-
-							if (item.normalisedEndDuration >= groupEndTime) {
-								times['endTime'] = item.normalisedEndDuration;
-							}
-							item.hasFoundAGroup = true;
-							groupsFound++;
-							break;
-						}
-					}
-				}
-
-				// unable to establish membership:
-				if (!item.hasFoundAGroup) {
-					groupTimes.push({
-						startTime: item.normalisedStartDuration,
-						endTime: item.normalisedEndDuration,
-						members: [item.uniqueIdentifer]
-					});
-					groupsFound++;
-					item.hasFoundAGroup = true;
-				}
-			}
-
-			timeOut++;
-		}
-
-		if (timeOutLimit == timeOut) {
-			console.log('Error Finding Group Pairing');
-		}
-		for (const groups of groupTimes) {
-			for (let i = 0; i < groups.members.length; i++) {
-				const element = groups.members[i];
-
-				for (const allMods of allTimes) {
-					if (allMods.uniqueIdentifer != element) continue;
-					allMods.groupIndex = i;
-					allMods.groupLength = groups.members.length;
-				}
-			}
+			console.log('Unable to find pairings');
 		}
 	}
 
@@ -143,7 +98,6 @@
 		modInfo: { [moduleCode: string]: Module },
 		userState: LessonInfo
 	): TimeTableDayInfo[] {
-		if (day != 1) return [];
 		const totalInfo: TimeTableDayInfo[] = [];
 		// For Displaying the Timetable:
 		for (const mod in modInfo) {
@@ -173,7 +127,7 @@
 						uniqueIdentifer: identifer,
 						hasFoundAGroup: false,
 						groupIndex: 0,
-						groupLength: 0
+						innerGroupLength: 0
 					});
 				}
 			}
@@ -197,14 +151,12 @@
 					uniqueIdentifer: identifer,
 					hasFoundAGroup: false,
 					groupIndex: 0,
-					groupLength: 0
+					innerGroupLength: 0
 				});
 			}
 		}
 
-		totalInfo.sort(
-			(a, b) =>
-				a.normalisedStartDuration - b.normalisedStartDuration);
+		totalInfo.sort((a, b) => a.normalisedStartDuration - b.normalisedStartDuration);
 
 		return totalInfo;
 	}
@@ -220,9 +172,10 @@
 			normalisedEndDuration={mod.normalisedEndDuration}
 			isAChoiceSelection={mod.isAChoiceSelection}
 			uniqueIdentifer={mod.uniqueIdentifer}
-			groupIndex={mod.groupIndex}
-			groupLength={mod.groupLength}
-			hasFoundAGroup={mod.hasFoundAGroup}
+			innerGroupLength={mod.innerGroupLength}
+			innerGroupIndex={mod.innerGroupIndex}
+			outerGroupIndex={mod.outerGroupIndex}
+			outerGroupLength={mod.outerGroupLength}
 		></TimetableDayComponent>
 	{/each}
 </div>
