@@ -12,8 +12,7 @@
 		innerGroupIndex,
 		innerGroupLength,
 		outerGroupIndex,
-		outerGroupLength,
-		uniqueIdentifer
+		outerGroupLength
 	}: TimeTableDayInfo = $props();
 
 	const spaceAllowedToUse = $derived(100.0 / outerGroupLength);
@@ -21,7 +20,7 @@
 	const leftMarginPercentage = $derived(
 		innerGroupIndex * (spaceAllowedToUse / innerGroupLength) + startingOuterOffset
 	);
-
+	const showModName = $state(true);
 	const width = $derived(spaceAllowedToUse / innerGroupLength);
 </script>
 
@@ -46,6 +45,7 @@
 		}
 	}}
 >
-	{moduleCode}
+	<div>{moduleCode} {showModName ? moduleName : ''}</div>
+
 	{lessonSchedule.lessonType} [{lessonSchedule.classNo}]
 </button>

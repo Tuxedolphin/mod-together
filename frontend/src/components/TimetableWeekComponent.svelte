@@ -26,12 +26,13 @@
 			[key: number]: TimeTableDayInfo[][];
 		} = {};
 		let lengthOfGroups = 0;
-		for (const _ in groupTimes) lengthOfGroups++;
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		for (const _len in groupTimes) lengthOfGroups++;
 		let groupId = 0;
 		while (processedTimings.length != lengthOfGroups && iterIdx != MAX_ITER) {
 			iterIdx++;
 			console.log(groupId);
-			let firstGroup: TimeTableDayInfo[] = null;
+			let firstGroup: TimeTableDayInfo[] = [];
 			let firstGroupProcess: string = '';
 			for (const i in groupTimes) {
 				if (processedTimings.includes(i)) continue;
@@ -128,9 +129,10 @@
 						normalisedEndDuration: normaliseDuration('0800', '2000', lesson.endTime),
 						isAChoiceSelection: false,
 						uniqueIdentifer: identifer,
-						hasFoundAGroup: false,
-						groupIndex: 0,
-						innerGroupLength: 0
+						innerGroupIndex: -1,
+						innerGroupLength: -1,
+						outerGroupIndex: -1,
+						outerGroupLength: -1
 					});
 				}
 			}
@@ -152,9 +154,10 @@
 					normalisedEndDuration: normaliseDuration('0800', '2000', lesson.endTime),
 					isAChoiceSelection: true,
 					uniqueIdentifer: identifer,
-					hasFoundAGroup: false,
-					groupIndex: 0,
-					innerGroupLength: 0
+					innerGroupIndex: -1,
+					innerGroupLength: -1,
+					outerGroupIndex: -1,
+					outerGroupLength: -1
 				});
 			}
 		}
