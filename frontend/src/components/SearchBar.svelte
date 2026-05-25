@@ -16,7 +16,12 @@
 		modSearch.addDocuments(summaries as ModSummary[]);
 	});
 
-	let results = $derived(modSearch.search(searchTerm)) as ModSummary[];
+	let results = $derived(
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		(modSearch.search(searchTerm) as ModSummary[]).sort((a, _) =>
+			a.semesters.includes(2) ? -1 : 1
+		)
+	);
 </script>
 
 <p>Search</p>

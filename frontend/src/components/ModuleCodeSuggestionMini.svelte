@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { currentlySelectedMods } from '../shared/shared.svelte';
+	import { currentlySelectedMods, preferences } from '../shared/shared.svelte';
 	import type { ModSummary } from '../types/mod_summaries';
-	import type { Module } from '../types/modules';
+	import { getFullModInfo } from '../utils/fetch_from_cache';
 
 	interface Mod {
 		mod: ModSummary;
@@ -10,11 +10,11 @@
 	let { mod }: Mod = $props();
 
 	async function addMod() {
-		const modFullInfo = (await (
-			await fetch(`https://api.nusmods.com/v2/2025-2026/modules/${mod.moduleCode}.json`)
-		).json()) as Module;
+		const modFullInfo = await getFullModInfo(mod.moduleCode, $preferences.acadYear);
 
-		const timeTable = modFullInfo.semesterData.find((sem) => sem.semester == 2)?.timetable;
+		const timeTable = modFullInfo.semesterData.find(
+			(sem) => sem.semester == $preferences.currentSemView
+		)?.timetable;
 		// Source - https://stackoverflow.com/a/75356213
 		// Posted by Peter Thoeny
 		// Retrieved 2026-05-21, License - CC BY-SA 4.0
@@ -31,8 +31,18 @@
 			const firstLesson = Object.keys(group[key])[0];
 			pairings[key] = firstLesson;
 		}
-		$currentlySelectedMods.selectedMods[mod.moduleCode] = pairings;
+
+		if (!$currentlySelectedMods[$preferences.acadYear]) {
+			$currentlySelectedMods[$preferences.acadYear] = {};
+		}
+
+		if (!$currentlySelectedMods[$preferences.acadYear][$preferences.currentSemView]) {
+			$currentlySelectedMods[$preferences.acadYear][$preferences.currentSemView] = {};
+		}
+		$currentlySelectedMods[$preferences.acadYear][$preferences.currentSemView][
+			modFullInfo.moduleCode
+		] = pairings;
 	}
 </script>
 
-<button class="h-12 w-full" onclick={addMod}>{mod.moduleCode} - {mod.title}</button>
+<button class="h-12 w-full" onclick={addMod}>{mod.moduleCode} - {mod.title} {mod.semesters}</button>

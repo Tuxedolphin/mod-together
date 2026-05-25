@@ -2,7 +2,12 @@
 	import TimetableDayComponent from './TimetableDayComponent.svelte';
 
 	import type { Module, RawLesson } from '../types/modules';
-	import { currentlySelectedMods, chooseModState, type LessonInfo } from '../shared/shared.svelte';
+	import {
+		currentlySelectedMods,
+		chooseModState,
+		type LessonInfo,
+		preferences
+	} from '../shared/shared.svelte';
 	import type { TimeTableDayInfo } from '../types/internal';
 	import { normaliseDuration } from '../utils/calculations_for_ui';
 
@@ -107,11 +112,14 @@
 		for (const mod in modInfo) {
 			const info = modInfo[mod];
 
-			const weekData = info.semesterData.find((semNo) => semNo.semester == 2);
+			const weekData = info.semesterData.find(
+				(semNo) => semNo.semester == $preferences.currentSemView
+			);
 			const ttData = weekData?.timetable.filter((x) => x.day == daysOfWeek[day]);
 
-			const selectedMod = $currentlySelectedMods.selectedMods[mod];
-
+			const selectedMod =
+				$currentlySelectedMods[$preferences.acadYear][$preferences.currentSemView][info.moduleCode];
+			console.log(selectedMod);
 			for (const lessonType in selectedMod) {
 				const classNo = selectedMod[lessonType];
 				const lessonForDay = ttData?.filter(
@@ -139,7 +147,9 @@
 		}
 		const lessonQuery = modInfo[userState.moduleCode];
 
-		const weekData = lessonQuery?.semesterData.find((semNo) => semNo.semester == 2);
+		const weekData = lessonQuery?.semesterData.find(
+			(semNo) => semNo.semester == $preferences.currentSemView
+		);
 		const ttData = weekData?.timetable.filter((x) => x.day == daysOfWeek[day]);
 		const lessonTypeToMatch = ttData?.filter((x) => x.lessonType == userState.lessonType);
 		if (lessonTypeToMatch) {

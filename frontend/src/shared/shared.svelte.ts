@@ -3,8 +3,20 @@ import type { SavedModInfo } from '../types/mod_summaries';
 
 // First param `preferences` is the local storage key.
 // Second param is the initial value.
-export const currentlySelectedMods = persisted('selectedMods', {
-	selectedMods: {} as { [key: string]: SavedModInfo }
+export const currentlySelectedMods = persisted(
+	'selectedMods',
+	{} as {
+		[acadYear: string]: {
+			[semesterNumber: number]: {
+				[moduleCode: string]: SavedModInfo;
+			};
+		};
+	}
+);
+
+export const preferences = persisted('prefs', {
+	currentSemView: 1,
+	acadYear: '2025-2026'
 });
 
 export const chooseModState = $state({

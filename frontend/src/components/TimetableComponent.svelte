@@ -2,7 +2,7 @@
 	import TimetableDayComponent from './TimetableWeekComponent.svelte';
 
 	import { onMount } from 'svelte';
-	import { currentlySelectedMods } from '../shared/shared.svelte';
+	import { currentlySelectedMods, preferences } from '../shared/shared.svelte';
 	import { getFullModInfo } from '../utils/fetch_from_cache';
 
 	import type { Module } from '../types/modules';
@@ -13,7 +13,7 @@
 		currentlySelectedMods.subscribe(async (mods) => {
 			for (const mod in mods.selectedMods) {
 				if (mod in fullModInfo) continue;
-				const info = await getFullModInfo(mod);
+				const info = await getFullModInfo(mod, $preferences.acadYear);
 				fullModInfo[mod] = info;
 			}
 		});

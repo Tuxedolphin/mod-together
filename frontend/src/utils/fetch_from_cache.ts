@@ -18,16 +18,16 @@ async function getFromCache<T>(cacheKey: string, fetchLink: string): Promise<T> 
 	return JSON.parse(item);
 }
 
-export async function getListOfModsSummary(): Promise<ModSummary[]> {
+export async function getListOfModsSummary(acadYear: string): Promise<ModSummary[]> {
 	return getFromCache<ModSummary[]>(
-		'modSummary',
-		'https://api.nusmods.com/v2/2025-2026/moduleList.json'
+		`modSummary-${acadYear}`,
+		`https://api.nusmods.com/v2/${acadYear}/moduleList.json`
 	);
 }
 
-export async function getFullModInfo(moduleCode: string): Promise<Module> {
+export async function getFullModInfo(moduleCode: string, acadYear: string): Promise<Module> {
 	return getFromCache<Module>(
-		moduleCode,
-		`https://api.nusmods.com/v2/2025-2026/modules/${moduleCode}.json`
+		`${moduleCode}-${acadYear}`,
+		`https://api.nusmods.com/v2/${acadYear}/modules/${moduleCode}.json`
 	);
 }

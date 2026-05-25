@@ -8,15 +8,23 @@
 	import { onMount } from 'svelte';
 	import type { ModSummary } from '../types/mod_summaries';
 	import { getListOfModsSummary } from '../utils/fetch_from_cache';
+	import { preferences } from '../shared/shared.svelte';
 
 	let modData = $state([]) as ModSummary[];
 	onMount(async () => {
-		modData = await getListOfModsSummary();
+		console.log($preferences);
+		modData = await getListOfModsSummary($preferences.acadYear);
+		// Setup Preferences:
 	});
 </script>
 
 {#if modData.length != 0}
 	<SearchBar summaries={modData}></SearchBar>
+
+	<div class="flex">
+		<button> Prev </button>
+		<div class="text-center">Semester {$preferences.currentSemView}</div>
+	</div>
 {/if}
 
 <div class="flex">
