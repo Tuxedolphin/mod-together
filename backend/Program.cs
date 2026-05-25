@@ -1,11 +1,11 @@
+using Backend.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-
-// For configuration of OpenAPI/Swagger, see https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddRouting(options =>
 {
@@ -29,11 +29,18 @@ builder
         };
     });
 
+// === Application Services ===
+
+builder.Services.AddScoped<ITimeTableService, TimeTableService>();
+
+// ===
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.UseAuthentication();
