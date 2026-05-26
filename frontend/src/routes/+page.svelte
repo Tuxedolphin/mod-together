@@ -8,7 +8,7 @@
 	import { onMount } from 'svelte';
 	import type { ModSummary } from '../types/mod_summaries';
 	import { getListOfModsSummary } from '../utils/fetch_from_cache';
-	import { preferences } from '../shared/shared.svelte';
+	import { currentlySelectedMods, preferences } from '../shared/shared.svelte';
 
 	let modData = $state([]) as ModSummary[];
 	onMount(async () => {
@@ -33,4 +33,8 @@
 		<DaysOfWeekHeader></DaysOfWeekHeader>
 		<TimetableComponent></TimetableComponent>
 	</div>
+</div>
+
+<div>
+	{$currentlySelectedMods}
 </div>
