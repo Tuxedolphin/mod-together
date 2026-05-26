@@ -7,8 +7,4 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
-<div class="navbar bg-base-100 shadow-sm">
-  <a class="btn btn-ghost text-xl">Mods Together!</a>
-</div>
-
 {@render children()}
