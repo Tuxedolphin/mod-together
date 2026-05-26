@@ -40,6 +40,8 @@
 				semester,
 				'you',
 				'test',
+				timeTableDayInfo.moduleCode,
+				timeTableDayInfo.lessonSchedule.lessonType,
 				timeTableDayInfo.lessonSchedule.classNo,
 				chooseModState
 			);

@@ -107,9 +107,14 @@ export async function modifyModEntry(
 	semesterNo: number,
 	owner: string,
 	timetableName: string,
+	moduleCode: string,
+	lessonType: string,
 	newLessonNo: string,
 	userState: LessonInfo
 ) {
+	if (moduleCode != userState.moduleCode || lessonType != userState.lessonType) {
+		return timetable;
+	}
 	const findTimetableCopy = timetable.filter(
 		(x) =>
 			x.Owner == owner &&
