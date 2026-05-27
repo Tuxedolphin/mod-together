@@ -9,4 +9,4 @@ namespace Backend.Controllers;
 [ApiController]
 [Authorize]
 public class TimeTableController(AppDbContext _context, ITimeTableService service)
-    : ControllerBase { }
+    : BaseController { }

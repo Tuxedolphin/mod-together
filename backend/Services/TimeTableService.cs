@@ -1,31 +1,37 @@
+using Backend.Data;
 using Backend.DTOs;
+using Backend.Exceptions;
 using Backend.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services;
 
-public class TimeTableService : ITimeTableService
+public class TimeTableService(AppDbContext context) : ITimeTableService
 {
+    private readonly AppDbContext _context = context;
+
     public async Task<TimeTable> CreateTimeTableAsync(TimeTable timeTable)
     {
         throw new NotImplementedException();
     }
 
-    public async Task DeleteTimeTableAsync(int id)
+    public async Task DeleteTimeTableAsync(Guid id)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<TimeTable> GetTimeTableByIdAsync(int id)
+    public async Task<TimeTable> GetTimeTableByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        return await _context.TimeTables.AsNoTracking().FirstOrDefaultAsync(t => t.Id == id)
+            ?? throw new NotFoundException($"TimeTable with ID {id} not found.");
     }
 
     public async Task<List<TimeTableSummaryResponse>> GetTimeTablesAsync()
     {
-        throw new NotImplementedException();
+        return await _context.TimeTables.AsNoTracking();
     }
 
-    public async Task UpdateTimeTableAsync(int id, TimeTable timeTable)
+    public async Task UpdateTimeTableAsync(Guid id, TimeTable timeTable)
     {
         throw new NotImplementedException();
     }
