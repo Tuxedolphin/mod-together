@@ -18,6 +18,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             GotrueException ex => (ex.StatusCode, ex.Message),
             NotFoundException ex => (404, ex.Message),
             ForbiddenException ex => (403, ex.Message),
+            ExternalServiceException ex => (502, ex.Message),
             _ => (500, "An unexpected error occurred."),
         };
 

@@ -43,3 +43,14 @@ public class ConflictException : Exception
     public ConflictException(string message, Exception inner)
         : base(message, inner) { }
 }
+
+public class ExternalServiceException : Exception
+{
+    public ExternalServiceException() { }
+
+    public ExternalServiceException(string message)
+        : base(message) { }
+
+    public ExternalServiceException(string message, Exception inner)
+        : base(message, inner) { }
+}
