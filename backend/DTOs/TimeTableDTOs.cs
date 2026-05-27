@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Backend.DTOs;
 
 public class TimeTableRequest
 {
+    [Required]
     public Guid Id { get; set; }
 }
 

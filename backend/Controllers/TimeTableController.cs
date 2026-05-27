@@ -8,7 +8,5 @@ namespace Backend.Controllers;
 [Route("[controller]")]
 [ApiController]
 [Authorize]
-public class TimeTableController(AppDbContext _context, ITimeTableService service) : ControllerBase
-{
-    private readonly AppDbContext _context;
-}
+public class TimeTableController(AppDbContext _context, ITimeTableService service)
+    : ControllerBase { }
