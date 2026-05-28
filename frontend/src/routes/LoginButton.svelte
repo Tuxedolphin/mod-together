@@ -22,7 +22,9 @@
 		loading = true;
 		const result = await login_to_db(email, password);
 		if (result.ok) {
-			// Head to auth:
+			// Stores access token in localstorage (FOR NOW) -- Not secure:!
+			localStorage.setItem('ac:tok', result.val.access_token);
+			goto(resolve('/planner'));
 		} else {
 			errorMessage = result.val;
 		}
