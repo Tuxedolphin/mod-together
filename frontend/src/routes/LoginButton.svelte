@@ -21,12 +21,12 @@
 	async function login() {
 		loading = true;
 		const result = await login_to_db(email, password);
-		if (result.ok) {
+		if (result.isOk()) {
 			// Stores access token in localstorage (FOR NOW) -- Not secure:!
-			localStorage.setItem('ac:tok', result.val.access_token);
+			localStorage.setItem('ac:tok', result.value.access_token);
 			goto(resolve('/planner'));
 		} else {
-			errorMessage = result.val;
+			errorMessage = result.error;
 		}
 		loading = false;
 	}

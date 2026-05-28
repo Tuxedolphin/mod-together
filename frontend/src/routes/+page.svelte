@@ -35,7 +35,7 @@
 						required
 						bind:value={emailInput}
 					/>
-					<p class="$$validator-hint hidden">Required</p>
+					<p class="validator-hint hidden">Required</p>
 				</fieldset>
 
 				<label class="fieldset">

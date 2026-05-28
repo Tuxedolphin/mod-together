@@ -1,7 +1,7 @@
 import { PUBLIC_DB_LINK } from '$env/static/public';
 import ky, { HTTPError } from 'ky';
 import type { AuthResponse } from '../types/db_raw_types';
-import { Err, Ok, type Result } from 'ts-results';
+import { Err, Ok, type Result } from 'ts-results-es';
 
 const apiCalls = ky.create({
 	baseUrl: PUBLIC_DB_LINK
