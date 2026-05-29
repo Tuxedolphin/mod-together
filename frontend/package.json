@@ -16,7 +16,7 @@
     "test": "npm run test:unit -- --run && npm run test:e2e",
     "test:e2e": "playwright install && playwright test",
     "gen": "wrangler types",
-    "deploy": "pnpm gen && pnpm run build && wrangler deploy",
+    "deploy": "pnpm run build && wrangler deploy",
     "cf-typegen": "wrangler types"
   },
   "devDependencies": {

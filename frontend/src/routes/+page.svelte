@@ -9,6 +9,7 @@
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { currentUserInformation } from '../shared/shared.svelte';
+	import { PUBLIC_DB_LINK } from '$env/static/public';
 
 	onMount(() => {
 		if ($currentUserInformation.displayName) {
@@ -17,6 +18,7 @@
 	});
 </script>
 
+<p>{PUBLIC_DB_LINK}</p>
 <ModTogetherHero>
 	<LoginComponent></LoginComponent>
 	<div class="divider">OR</div>

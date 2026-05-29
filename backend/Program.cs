@@ -63,12 +63,15 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
-app.UseCors(b => b.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod());
-
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+    app.UseCors(b => b.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod());
+}
+else
+{
+    app.UseCors(b => b.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod());
 }
 
 app.UseExceptionHandler();
