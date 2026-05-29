@@ -16,7 +16,7 @@ public class TimeTable
 
     // No FK constraint since users is handled by supabase auth, and apparently this is standard practice for supabase auth since they have thier own table
     [JsonIgnore]
-    public required Guid UserId { get; set; }
+    public Guid UserId { get; set; }
     public string Name { get; set; } = string.Empty; // Name of the time table, selected by user
 
     // The following fields are placed here, instead of TimeTableModule since all the modules will havae the same semester and academic year
