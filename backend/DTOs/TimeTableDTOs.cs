@@ -3,12 +3,6 @@ using Backend.Models;
 
 namespace Backend.DTOs;
 
-public class TimeTableRequest
-{
-    [Required]
-    public Guid Id { get; set; }
-}
-
 public class TimeTableSummaryResponse
 {
     public required Guid Id { get; set; }
@@ -39,6 +33,7 @@ public class UpdateTimeTableRequest
     [Required]
     public string Name { get; set; } = string.Empty;
 
+    [Required]
     public int Semester { get; set; }
 
     [Required]

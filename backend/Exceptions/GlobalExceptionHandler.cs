@@ -19,6 +19,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         {
             ValidationException ex => (400, ex.Message),
             GotrueException ex => (ex.StatusCode, ex.Message),
+            UnauthorizedAccessException ex => (401, ex.Message),
             NotFoundException ex => (404, ex.Message),
             ForbiddenException ex => (403, ex.Message),
             ExternalServiceException ex => (502, ex.Message),

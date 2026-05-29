@@ -35,11 +35,7 @@ public class TimeTableService(AppDbContext context) : ITimeTableService
             .ExecuteDeleteAsync();
 
         if (rows == 0)
-        {
-            throw new NotFoundException(
-                $"TimeTable with id {timeTableId} belonging to userId {userId} not found."
-            );
-        }
+            throw new NotFoundException($"Timetable with id {timeTableId} not found");
     }
 
     public async Task<TimeTable> GetTimeTableByIdAsync(Guid timeTableId, Guid userId)

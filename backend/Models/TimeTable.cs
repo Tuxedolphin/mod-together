@@ -23,7 +23,5 @@ public class TimeTable
     public required int Semester { get; set; }
     public required string AcademicYear { get; set; } = string.Empty;
     public required List<TimeTableModule> MetaData { get; set; }
-
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; }
 }
