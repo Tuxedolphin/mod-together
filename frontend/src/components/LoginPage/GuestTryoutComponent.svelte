@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { currentUserInformation } from '../../shared/shared.svelte';
+	import { access_token, currentUserInformation } from '../../shared/shared.svelte';
 
 	let nameInput = $state('');
 	onMount(() => {
@@ -21,7 +21,8 @@
 	class="btn {nameInput.length === 0 ? 'btn-disabled' : ''} btn-primary"
 	onclick={() => {
 		$currentUserInformation.displayName = nameInput;
-		$currentUserInformation.isGuest = true;
+		$access_token.isGuestLogin = true;
+		$access_token.access_token = '';
 		goto(resolve('/planner'));
 	}}>Plan as a guest</button
 >

@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import { currentUserInformation } from '../../shared/shared.svelte';
+	import { access_token, currentUserInformation } from '../../shared/shared.svelte';
 	import { login_to_db } from '../../utils/db_operations';
 
 	interface LoginButtonProps {
@@ -23,7 +23,7 @@
 		const result = await login_to_db(email, password);
 		if (result.isOk()) {
 			// Stores access token in localstorage (FOR NOW) -- Not secure:!
-			localStorage.setItem('ac:tok', result.value.access_token);
+			$access_token = result.value.access_token;
 			goto(resolve('/planner'));
 		} else {
 			errorMessage = result.error;
