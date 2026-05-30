@@ -6,6 +6,7 @@ import type {
 	ErrorInformation,
 	ErrorResponse,
 	TimetableInfos,
+	TimetableWithMetadata,
 	UserProfileResponse
 } from '../types/db_raw_types';
 import { Err, Ok, type Result } from 'ts-results-es';
@@ -32,7 +33,6 @@ export async function register_db(
 	} catch (error) {
 		try {
 			if (error instanceof HTTPError) {
-				console.log(error.data);
 				const errorResponse = error.data as ErrorResponse;
 				const errorMessage = JSON.parse(errorResponse.title) as ErrorInformation;
 				return new Err(errorMessage.msg);
@@ -62,7 +62,6 @@ export async function login_to_db(
 	} catch (error) {
 		try {
 			if (error instanceof HTTPError) {
-				console.log(error.data);
 				const errorResponse = error.data as ErrorResponse;
 				const errorMessage = JSON.parse(errorResponse.title) as ErrorInformation;
 				return new Err(errorMessage.msg);
@@ -96,7 +95,6 @@ export async function put_user_info(
 	} catch (error) {
 		try {
 			if (error instanceof HTTPError) {
-				console.log(error.data);
 				const errorResponse = error.data as ErrorResponse;
 				const errorMessage = JSON.parse(errorResponse.title) as ErrorInformation;
 				return new Err(errorMessage.msg);
@@ -128,7 +126,6 @@ export async function get_user_info(
 	} catch (error) {
 		try {
 			if (error instanceof HTTPError) {
-				console.log(error.data);
 				const errorResponse = error.data as ErrorResponse;
 				const errorMessage = JSON.parse(errorResponse.title) as ErrorInformation;
 				return new Err(errorMessage.msg);
@@ -158,6 +155,52 @@ export async function get_timetables(
 			.json<TimetableInfos>();
 
 		return Ok(timetables);
+	} catch (error) {
+		return Err('Something went wrong ' + error);
+	}
+}
+
+export async function get_timetable_by_id(
+	access_token: string,
+	timetable_id: string
+): Promise<Result<TimetableWithMetadata, string>> {
+	try {
+		const timetables = await apiCalls
+			.get(`/timetable/${timetable_id}`, {
+				hooks: {
+					beforeRequest: [
+						({ request }) => {
+							request.headers.set('Authorization', `Bearer ${access_token}`);
+						}
+					]
+				}
+			})
+			.json<TimetableWithMetadata>();
+		return Ok(timetables);
+	} catch (error) {
+		return Err('Something went wrong ' + error);
+	}
+}
+
+export async function put_timetable_by_id(
+	access_token: string,
+	timetable_id: string,
+	timetable_data: TimetableWithMetadata
+): Promise<Result<string, string>> {
+	try {
+		const timetables = await apiCalls
+			.put(`/timetable/${timetable_id}`, {
+				hooks: {
+					beforeRequest: [
+						({ request }) => {
+							request.headers.set('Authorization', `Bearer ${access_token}`);
+						}
+					]
+				},
+				json: timetable_data
+			})
+			.json();
+		return Ok('');
 	} catch (error) {
 		return Err('Something went wrong ' + error);
 	}

@@ -1,0 +1,88 @@
+<script lang="ts">
+	import DaysOfWeekHeader from '$lib/components/DaysOfWeekHeader.svelte';
+	import SearchBar from '$lib/components/SearchBar.svelte';
+	import Timeline from '$lib/components/Timeline.svelte';
+	import TimetableComponent from '$lib/components/TimetableComponent.svelte';
+	import { preferences, currentlySelectedMods, access_token } from '$lib/shared/shared.svelte';
+	import { getTimetable } from '$lib/utils/format_db_information';
+	import { onMount } from 'svelte';
+
+	let is_timetable_loaded = $state(false);
+	let timetable_metadata: TimetableWithMetadata = $state({
+		academicYear: '',
+		createdAt: '',
+		id: '',
+		metaData: [],
+		name: '',
+		semester: 0
+	});
+
+	let currentTimetableDisplay = $derived(
+		getTimetable(
+			timetable_metadata.academicYear,
+			timetable_metadata.semester,
+			$currentlySelectedMods
+		)
+	);
+
+	import type { PageProps } from './$types';
+	import { get_timetable_by_id, put_timetable_by_id } from '$lib/utils/db_operations';
+	import type { TimetableWithMetadata } from '$lib/types/db_raw_types';
+	let { params }: PageProps = $props();
+
+	onMount(async () => {
+		is_timetable_loaded = false;
+		const timetable_data = await get_timetable_by_id(
+			$access_token.access_token,
+			params.timetable_id
+		);
+
+		if (timetable_data.isOk()) {
+			timetable_metadata = timetable_data.value;
+			$currentlySelectedMods = [timetable_data.value];
+			is_timetable_loaded = true;
+		}
+
+		currentlySelectedMods.subscribe(async (updated_timetable) => {
+			for (const timetable of updated_timetable) {
+				if (timetable.id == params.timetable_id) {
+					console.log('Update for Timetable ' + timetable.id);
+				}
+				// 	console.log(timetable);
+				// 	const response = await put_timetable_by_id(
+				// 		$access_token.access_token,
+				// 		timetable.id,
+				// 		timetable
+				// 	);
+				// 	if (response.isOk()) {
+				// 	}
+				// }
+			}
+		});
+	});
+</script>
+
+{#if is_timetable_loaded}
+	<SearchBar
+		timetable_id={timetable_metadata.id}
+		timetable_name={timetable_metadata.name}
+		acadYear={timetable_metadata.academicYear}
+		semester={timetable_metadata.semester}
+	></SearchBar>
+
+	<div class="flex">
+		<Timeline></Timeline>
+		<div class="flex-1 flex-col">
+			<DaysOfWeekHeader></DaysOfWeekHeader>
+			<TimetableComponent
+				timetable_id={timetable_metadata.id}
+				timetable_name={timetable_metadata.name}
+				timetables={currentTimetableDisplay}
+				acadYear={$preferences.acadYear}
+				semester={$preferences.currentSemView}
+			></TimetableComponent>
+		</div>
+	</div>
+
+	<!-- <ModListGroup {currentTimetableDisplay}></ModListGroup> -->
+{/if}

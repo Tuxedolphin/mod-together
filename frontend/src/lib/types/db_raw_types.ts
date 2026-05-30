@@ -34,3 +34,13 @@ export interface TimetableInfo {
 	academicYear: string;
 	createdAt: string;
 }
+
+export interface TimetableWithMetadata extends TimetableInfo {
+	metaData: TimetableLessonMetadata[];
+}
+
+export interface TimetableLessonMetadata {
+	moduleCode: string;
+	lessonNo: string;
+	lessonType: string;
+}
