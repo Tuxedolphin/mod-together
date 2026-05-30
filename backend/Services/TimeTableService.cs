@@ -65,18 +65,15 @@ public class TimeTableService(AppDbContext context) : ITimeTableService
 
     public async Task UpdateTimeTableAsync(Guid id, UpdateTimeTableRequest request, Guid userId)
     {
-        var rows = await _context
-            .TimeTables.Where(t => t.Id == id && t.UserId == userId)
-            .ExecuteUpdateAsync(t =>
-                t.SetProperty(t => t.Name, request.Name)
-                    .SetProperty(t => t.Semester, request.Semester)
-                    .SetProperty(t => t.AcademicYear, request.AcademicYear)
-                    .SetProperty(t => t.MetaData, request.MetaData)
-            );
+        var timetable =
+            await _context.TimeTables.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId)
+            ?? throw new NotFoundException($"Timetable with id {id} not found");
 
-        if (rows == 0)
-        {
-            throw new NotFoundException($"TimeTable with id {id} not found.");
-        }
+        timetable.Name = request.Name;
+        timetable.Semester = request.Semester;
+        timetable.AcademicYear = request.AcademicYear;
+        timetable.MetaData = request.MetaData;
+
+        await _context.SaveChangesAsync();
     }
 }

@@ -21,6 +21,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<TimeTable>().OwnsMany(t => t.MetaData, builder => builder.ToJson());
-        modelBuilder.Entity<TimeTable>().Property(t => t.CreatedAt).HasDefaultValueSql("now()");
+        modelBuilder
+            .Entity<TimeTable>()
+            .Property(t => t.CreatedAt)
+            .ValueGeneratedOnAdd()
+            .HasDefaultValueSql("now()");
     }
 }
