@@ -24,3 +24,13 @@ export interface ErrorInformation {
 	error_code: string;
 	msg: string;
 }
+
+export type TimetableInfos = TimetableInfo[];
+
+export interface TimetableInfo {
+	id: string;
+	name: string;
+	semester: number;
+	academicYear: string;
+	createdAt: string;
+}

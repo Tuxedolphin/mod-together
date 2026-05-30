@@ -1,13 +1,17 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { access_token } from '$lib/shared/shared.svelte';
 	import { get_user_info } from '$lib/utils/db_operations';
 	import { onMount } from 'svelte';
 
+	interface GreetingComponentProps {
+		access_token: string;
+	}
+	const { access_token }: GreetingComponentProps = $props();
 	let username = $state('');
 	onMount(async () => {
-		const tt = await get_user_info($access_token.access_token);
+		console.log(access_token);
+		const tt = await get_user_info(access_token);
 
 		if (tt.isOk()) {
 			if (!tt.value.username) {
@@ -19,4 +23,8 @@
 	});
 </script>
 
-<div>Welcome, {username}</div>
+{#if username}
+	<div class="text-xl">Welcome, {username}, glad you could join us.</div>
+{:else}
+	<div class="h-12 w-full skeleton"></div>
+{/if}

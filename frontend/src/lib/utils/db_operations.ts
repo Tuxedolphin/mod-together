@@ -5,6 +5,7 @@ import type {
 	AuthSucessResponse,
 	ErrorInformation,
 	ErrorResponse,
+	TimetableInfos,
 	UserProfileResponse
 } from '../types/db_raw_types';
 import { Err, Ok, type Result } from 'ts-results-es';
@@ -140,16 +141,24 @@ export async function get_user_info(
 	}
 }
 
-export async function get_timetables(access_token: string) {
-	const timetables = await apiCalls.get('/timetable', {
-		hooks: {
-			beforeRequest: [
-				({ request }) => {
-					request.headers.set('Authorization', `Bearer ${access_token}`);
+export async function get_timetables(
+	access_token: string
+): Promise<Result<TimetableInfos, string>> {
+	try {
+		const timetables = await apiCalls
+			.get('/timetable', {
+				hooks: {
+					beforeRequest: [
+						({ request }) => {
+							request.headers.set('Authorization', `Bearer ${access_token}`);
+						}
+					]
 				}
-			]
-		}
-	});
+			})
+			.json<TimetableInfos>();
 
-	console.log(timetables);
+		return Ok(timetables);
+	} catch (error) {
+		return Err('Something went wrong ' + error);
+	}
 }
