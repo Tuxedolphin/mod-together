@@ -18,12 +18,12 @@ export const registered = writable(false);
 
 interface AccessTokenInfo {
 	access_token: string;
-	isGuestLogin: boolean;
+	is_guest_login: boolean;
 }
 
 export const access_token = persisted('ac:tok', {
 	access_token: '',
-	isGuestLogin: false
+	is_guest_login: false
 } as AccessTokenInfo);
 
 export const currentUserInformation = persisted('user', {} as UserInfo);

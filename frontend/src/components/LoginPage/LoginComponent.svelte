@@ -23,7 +23,7 @@
 		}
 		registered.set(false);
 
-		if ($access_token.access_token !== '' || $access_token.isGuestLogin) {
+		if ($access_token.access_token !== '' || $access_token.is_guest_login) {
 			goto(resolve('/planner'));
 		}
 	});

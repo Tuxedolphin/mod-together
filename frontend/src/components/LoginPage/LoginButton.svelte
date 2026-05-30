@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { access_token, currentUserInformation } from '../../shared/shared.svelte';
-	import { login_to_db } from '../../utils/db_operations';
+	import { get_timetables, login_to_db } from '../../utils/db_operations';
 
 	interface LoginButtonProps {
 		email: string;
@@ -23,8 +23,13 @@
 		const result = await login_to_db(email, password);
 		if (result.isOk()) {
 			// Stores access token in localstorage (FOR NOW) -- Not secure:!
-			$access_token = result.value.access_token;
-			goto(resolve('/planner'));
+			$access_token.access_token = result.value.accessToken;
+			$access_token.is_guest_login = false;
+
+			const tt = await get_timetables($access_token.access_token);
+
+			console.log(tt);
+			// goto(resolve('/planner'));
 		} else {
 			errorMessage = result.error;
 		}
