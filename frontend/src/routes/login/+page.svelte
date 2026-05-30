@@ -19,7 +19,6 @@
 
 <ModTogetherHero>
 	<LoginComponent></LoginComponent>
-	<div class="divider">OR</div>
-
-	<GuestTryoutComponent></GuestTryoutComponent>
+	<!-- <div class="divider">OR</div> -->
+	<!-- <GuestTryoutComponent></GuestTryoutComponent> -->
 </ModTogetherHero>
