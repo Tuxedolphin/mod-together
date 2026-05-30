@@ -203,3 +203,23 @@ export async function put_timetable_by_id(
 		return Err('Something went wrong ' + error);
 	}
 }
+
+export async function delete_timetable_by_id(
+	access_token: string,
+	timetable_id: string
+): Promise<Result<string, string>> {
+	try {
+		await apiCalls.delete(`/timetable/${timetable_id}`, {
+			hooks: {
+				beforeRequest: [
+					({ request }) => {
+						request.headers.set('Authorization', `Bearer ${access_token}`);
+					}
+				]
+			}
+		});
+		return Ok('');
+	} catch (error) {
+		return Err('Something went wrong ' + error);
+	}
+}

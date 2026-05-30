@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import type { TimetableInfos } from '$lib/types/db_raw_types';
 	import { get_timetables } from '$lib/utils/db_operations';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import TimeTableCardComponent from './TimeTableCardComponent.svelte';
+	import { timetable_list_should_be_refreshed } from '$lib/shared/shared.svelte';
+	import type { Unsubscriber } from 'svelte/store';
 
 	interface AvailableTimetableGridProps {
 		access_token: string;
@@ -11,32 +12,31 @@
 
 	let { access_token }: AvailableTimetableGridProps = $props();
 	let availableTimetables: TimetableInfos = $state([]);
+	let unsubscribe_from_refresh: Unsubscriber;
 	onMount(async () => {
-		const timetable_request = await get_timetables(access_token);
+		unsubscribe_from_refresh = timetable_list_should_be_refreshed.subscribe(
+			async (should_be_refreshed) => {
+				if (!should_be_refreshed) return;
+				const timetable_request = await get_timetables(access_token);
+				console.log('Requested!');
+				if (timetable_request.isOk()) {
+					availableTimetables = [...timetable_request.value];
+				}
 
-		if (timetable_request.isOk()) {
-			availableTimetables = timetable_request.value;
-		}
+				timetable_list_should_be_refreshed.set(false);
+			}
+		);
+
+		timetable_list_should_be_refreshed.set(true);
+	});
+
+	onDestroy(() => {
+		unsubscribe_from_refresh();
 	});
 </script>
 
 <div class="grid grid-cols-3 gap-4">
 	{#each availableTimetables as timetable (timetable.id)}
-		<div class="card w-full bg-base-300 card-border">
-			<div class="card-body">
-				<h2 class="card-title">{timetable.name}</h2>
-				<p>
-					Timetable for AY{timetable.academicYear}, Semester {timetable.semester}
-				</p>
-				<div class="card-actions justify-end">
-					<button
-						class="btn btn-primary"
-						onclick={() =>
-							goto(resolve('/(app)/planner/[timetable_id]', { timetable_id: timetable.id }))}
-						>Edit Timetable</button
-					>
-				</div>
-			</div>
-		</div>
+		<TimeTableCardComponent {access_token} {timetable}></TimeTableCardComponent>
 	{/each}
 </div>

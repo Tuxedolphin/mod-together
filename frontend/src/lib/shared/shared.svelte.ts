@@ -15,6 +15,7 @@ interface UserInfo {
 }
 
 export const registered = writable(false);
+export const timetable_list_should_be_refreshed = writable(false);
 
 interface AccessTokenInfo {
 	access_token: string;

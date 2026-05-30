@@ -5,7 +5,7 @@
 	import TimetableComponent from '$lib/components/TimetableComponent.svelte';
 	import { preferences, currentlySelectedMods, access_token } from '$lib/shared/shared.svelte';
 	import { getTimetable } from '$lib/utils/format_db_information';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	let is_timetable_loaded = $state(false);
 	let timetable_metadata: TimetableWithMetadata = $state({
@@ -28,8 +28,9 @@
 	import type { PageProps } from './$types';
 	import { get_timetable_by_id, put_timetable_by_id } from '$lib/utils/db_operations';
 	import type { TimetableWithMetadata } from '$lib/types/db_raw_types';
+	import type { Unsubscriber } from 'svelte/store';
 	let { params }: PageProps = $props();
-
+	let unsubscribe_from_mods_list: Unsubscriber;
 	onMount(async () => {
 		is_timetable_loaded = false;
 		const timetable_data = await get_timetable_by_id(
@@ -41,7 +42,7 @@
 			timetable_metadata = timetable_data.value;
 			$currentlySelectedMods = [timetable_data.value];
 
-			currentlySelectedMods.subscribe(
+			unsubscribe_from_mods_list = currentlySelectedMods.subscribe(
 				async (updated_timetable) => {
 					for (const timetable of updated_timetable) {
 						if (timetable.id == params.timetable_id) {
@@ -62,6 +63,12 @@
 			);
 
 			is_timetable_loaded = true;
+		}
+	});
+
+	onDestroy(() => {
+		if (unsubscribe_from_mods_list) {
+			unsubscribe_from_mods_list();
 		}
 	});
 </script>
