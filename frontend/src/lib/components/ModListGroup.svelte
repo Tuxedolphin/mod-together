@@ -4,7 +4,7 @@
 	import type { TimeTable } from '../../lib/types/mod_summaries';
 
 	interface ModListProps {
-		currentTimetableDisplay: TimeTable[];
+		currentTimetableDisplay: TimetableWithMetadata[];
 	}
 	let { currentTimetableDisplay }: ModListProps = $props();
 </script>

@@ -1,9 +1,5 @@
 <script lang="ts">
-	import {
-		currentlySelectedMods,
-		currentUserInformation,
-		chooseModState
-	} from '$lib/shared/shared.svelte';
+	import { currentlySelectedMods, chooseModState } from '$lib/shared/shared.svelte';
 	import type { TimeTableDayInfo } from '$lib/types/internal';
 	import { modifyModEntry } from '$lib/utils/format_db_information';
 
@@ -11,8 +7,11 @@
 		timeTableDayInfo: TimeTableDayInfo;
 		semester: number;
 		acadYear: string;
+		timetable_id: string;
+		timetable_name: string;
 	}
-	const { timeTableDayInfo, acadYear, semester }: TimetableDayProps = $props();
+	const { timeTableDayInfo, acadYear, semester, timetable_id, timetable_name }: TimetableDayProps =
+		$props();
 
 	const spaceAllowedToUse = $derived(100.0 / timeTableDayInfo.outerGroupLength);
 	const startingOuterOffset = $derived(timeTableDayInfo.outerGroupIndex * spaceAllowedToUse);
@@ -44,8 +43,8 @@
 					$currentlySelectedMods,
 					acadYear,
 					semester,
-					$currentUserInformation.displayName,
-					'test',
+					timetable_id,
+					timetable_name,
 					timeTableDayInfo.moduleCode,
 					timeTableDayInfo.lessonSchedule.lessonType,
 					timeTableDayInfo.lessonSchedule.classNo,
