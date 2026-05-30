@@ -10,7 +10,6 @@
 	const { access_token }: GreetingComponentProps = $props();
 	let username = $state('');
 	onMount(async () => {
-		console.log(access_token);
 		const tt = await get_user_info(access_token);
 
 		if (tt.isOk()) {

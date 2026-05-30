@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { TimetableInfos } from '$lib/types/db_raw_types';
 	import { get_timetables } from '$lib/utils/db_operations';
 	import { onMount } from 'svelte';
@@ -27,7 +29,12 @@
 					Timetable for AY{timetable.academicYear}, Semester {timetable.semester}
 				</p>
 				<div class="card-actions justify-end">
-					<button class="btn btn-primary">Edit Timetable</button>
+					<button
+						class="btn btn-primary"
+						onclick={() =>
+							goto(resolve('/(app)/planner/[timetable_id]', { timetable_id: timetable.id }))}
+						>Edit Timetable</button
+					>
 				</div>
 			</div>
 		</div>
