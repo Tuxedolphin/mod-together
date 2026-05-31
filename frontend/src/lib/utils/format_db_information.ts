@@ -31,7 +31,6 @@ export async function queryAvailableLessons(
 	const resultingTimetables: TimeTableDayInfo[] = [];
 
 	if (userState.moduleCode === '') return resultingTimetables;
-
 	const modInfo = await getFullModInfo(userState.moduleCode, acadYear);
 	const weekData = modInfo?.semesterData.find((semNo) => semNo.semester == semester);
 	const ttData = weekData?.timetable.filter((x) => x.day == daysOfWeek[day]);

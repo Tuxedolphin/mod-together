@@ -5,11 +5,6 @@ import { writable } from 'svelte/store';
 // Second param is the initial value.
 export const currentlySelectedMods = persisted('selectedMods', [] as TimetableWithMetadata[]);
 
-export const preferences = persisted('prefs', {
-	currentSemView: 2,
-	acadYear: '2025-2026'
-});
-
 interface UserInfo {
 	displayName: string;
 }

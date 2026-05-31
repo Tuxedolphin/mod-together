@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { currentlySelectedMods, preferences, searchTerm } from '$lib/shared/shared.svelte';
+	import { currentlySelectedMods, searchTerm } from '$lib/shared/shared.svelte';
 	import type { ModSummary } from '$lib/types/mod_summaries';
 	import { getFullModInfo } from '$lib/utils/fetch_from_cache';
 	import { checkModAlreadyAdded, createModEntry } from '$lib/utils/format_db_information';
@@ -48,7 +48,7 @@
 </script>
 
 <button class="h-12 w-full" onclick={addMod}>
-	{#if !mod.semesters.includes($preferences.currentSemView)}
+	{#if !mod.semesters.includes(semester)}
 		{mod.moduleCode} - {mod.title} - Not Offered in this semester
 	{:else}
 		{mod.moduleCode} - {mod.title}
