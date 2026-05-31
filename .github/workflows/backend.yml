@@ -5,10 +5,10 @@ name: .NET
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "prod/**" ]
     paths: ["backend/**"]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "prod/**" ]
     paths: ["backend/**"]
 
 jobs:

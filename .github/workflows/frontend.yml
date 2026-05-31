@@ -43,5 +43,8 @@ jobs:
       - name: Build
         run: pnpm build
 
+      - name: Install Playwright for Unit Tests
+        run: pnpm exec playwright install
+
       - name: Unit tests
         run: pnpm test:unit -- --run
