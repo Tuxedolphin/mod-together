@@ -8,6 +8,7 @@ jobs:
   backend-checks:
     runs-on: ubuntu-latest
     steps:
+      - run: ls -a
       - uses: actions/checkout@v6
       - uses: ./.github/workflows
 
