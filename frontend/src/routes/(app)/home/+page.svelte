@@ -1,5 +1,5 @@
 <script lang="ts">
-  import CreateNewTimetableButton from './CreateNewTimetableButton.svelte';
+	import CreateNewTimetableButton from './CreateNewTimetableButton.svelte';
 
 	import { onMount } from 'svelte';
 	import GreetingComponent from '$lib/components/GreetingComponent.svelte';

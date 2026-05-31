@@ -7,7 +7,7 @@
 	let nameInput = $state('');
 	onMount(() => {
 		if ($currentUserInformation.displayName) {
-			goto(resolve('/planner'));
+			goto(resolve('/home'));
 		}
 	});
 </script>
@@ -23,6 +23,6 @@
 		$currentUserInformation.displayName = nameInput;
 		$access_token.is_guest_login = true;
 		$access_token.access_token = '';
-		goto(resolve('/planner'));
+		goto(resolve('/home'));
 	}}>Plan as a guest</button
 >

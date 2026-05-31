@@ -6,6 +6,7 @@
 </script>
 
 <div class="navbar bg-base-200 shadow-sm">
+	<!-- svelte-ignore a11y_missing_attribute -->
 	<a class="btn text-xl btn-ghost">Mods Together!</a>
 </div>
 

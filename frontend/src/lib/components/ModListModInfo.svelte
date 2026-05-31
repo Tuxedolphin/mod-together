@@ -15,6 +15,7 @@
 	<div class="card w-full bg-base-300 card-border">
 		<div class="flex justify-between p-4">
 			<div class="flex gap-2">
+				<!-- svelte-ignore a11y_consider_explicit_label -->
 				<button class="flex-initial {lesson_groups[lesson]![0].colour} badge"></button>
 				<div class="flex-none">{lesson}</div>
 			</div>
