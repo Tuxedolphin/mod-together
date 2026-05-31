@@ -4,7 +4,7 @@
 	import { timetable_list_should_be_refreshed } from '$lib/shared/shared.svelte';
 	import type { TimetableInfo } from '$lib/types/db_raw_types';
 	import { delete_timetable_by_id } from '$lib/utils/db_operations';
-	import { format_semester_name } from '$lib/utils/text_formatting';
+	import { format_semester_name } from '$lib/utils/formatting_utils';
 
 	interface TimeTableCardComponentProps {
 		timetable: TimetableInfo;

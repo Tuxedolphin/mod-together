@@ -5,6 +5,7 @@ import type { RawLesson } from '$lib/types/modules';
 
 import { normaliseDuration } from './calculations_for_ui';
 import { getFullModInfo } from './fetch_from_cache';
+import { get_randomised_colour } from './formatting_utils';
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 const startOfDayTime = '0800';
@@ -48,7 +49,8 @@ export async function queryAvailableLessons(
 				innerGroupIndex: -1,
 				innerGroupLength: -1,
 				outerGroupIndex: -1,
-				outerGroupLength: -1
+				outerGroupLength: -1,
+				timetableColour: userState.colour
 			});
 		}
 	}
@@ -94,7 +96,8 @@ export async function filterTimetableByDay(
 						lessonDayInfo.startTime
 					),
 					moduleCode: lesson.moduleCode,
-					moduleName: modInfo.title
+					moduleName: modInfo.title,
+					timetableColour: lesson.colour
 				});
 			}
 		}
@@ -172,23 +175,16 @@ export async function createModEntry(
 			x.name == timetableName
 	);
 	const lessonDataRef: TimetableLessonMetadata[] = [];
-	// No entries found: create new one:
-	// if (findTimetableCopy.length == 0) {
-	// 	timetable.push({
-	// 		academicYear: acadYear,
-	// 		: lessonDataRef,
-	// 		Name: timetableName,
-	// 		Owner: id,
-	// 		Semester: semesterNo
-	// 	});
-	// }
+
 	const lessonTypes = Object.groupBy(rawLesson, (x) => x.lessonType);
+	const assigned_color = get_randomised_colour(timetable);
 	for (const lessonType in lessonTypes) {
 		const lesson = lessonTypes[lessonType]![0];
 		lessonDataRef.push({
 			lessonNo: lesson.classNo,
 			lessonType: lesson.lessonType,
-			moduleCode: moduleCode
+			moduleCode: moduleCode,
+			colour: assigned_color
 		});
 	}
 

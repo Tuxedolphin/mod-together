@@ -29,7 +29,7 @@
 	import { get_timetable_by_id, put_timetable_by_id } from '$lib/utils/db_operations';
 	import type { TimetableWithMetadata } from '$lib/types/db_raw_types';
 	import type { Unsubscriber } from 'svelte/store';
-	import { format_semester_name } from '$lib/utils/text_formatting';
+	import { format_semester_name } from '$lib/utils/formatting_utils';
 	import ModListGroup from '$lib/components/ModListGroup.svelte';
 	let { params }: PageProps = $props();
 	let unsubscribe_from_mods_list: Unsubscriber;

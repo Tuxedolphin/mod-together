@@ -41,4 +41,5 @@ export interface LessonInfo {
 	moduleCode: string;
 	lessonType: string;
 	classNo: string;
+	colour: string;
 }

@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { access_token } from '$lib/shared/shared.svelte';
 	import { create_empty_timetable } from '$lib/utils/db_operations';
-	import { format_semester_name } from '$lib/utils/text_formatting';
+	import { format_semester_name } from '$lib/utils/formatting_utils';
 
 	let dialog: HTMLDialogElement;
 	let timetable_name = $state('');

@@ -43,11 +43,12 @@ export interface TimetableLessonMetadata {
 	moduleCode: string;
 	lessonNo: string;
 	lessonType: string;
+	colour: string;
 }
 
 export interface TimetablePostTemplate {
 	name: string;
 	semester: number;
 	academicYear: string;
-	metaData: never[]
+	metaData: never[];
 }

@@ -30,6 +30,7 @@
 		<TimetableDayComponent
 			{timetable_id}
 			{timetable_name}
+			timetable_colour={timetableDayInfo.timetableColour}
 			timeTableDayInfo={timetableDayInfo}
 			{acadYear}
 			{semester}
