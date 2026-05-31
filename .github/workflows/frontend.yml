@@ -8,6 +8,9 @@ on:
     branches: ["main"]
     paths: ["frontend/**"]
 
+env:
+  PUBLIC_DB_LINK: ${{ env.PUBLIC_DB_LINK }}
+
 jobs:
   ci:
     runs-on: ubuntu-latest
