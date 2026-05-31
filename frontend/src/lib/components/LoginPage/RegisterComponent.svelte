@@ -12,6 +12,7 @@
 {#if !$registered}
 	<form class="fieldset content-around px-4">
 		<fieldset class="fieldset">
+			<!-- svelte-ignore a11y_label_has_associated_control -->
 			<label class="label">Email</label>
 			<input
 				type="email"
