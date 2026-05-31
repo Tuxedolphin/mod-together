@@ -9,7 +9,7 @@ on:
     paths: ["frontend/**"]
 
 env:
-  PUBLIC_DB_LINK: ${{ env.PUBLIC_DB_LINK }}
+  PUBLIC_DB_LINK: ${{ vars.PUBLIC_DB_LINK }}
 
 jobs:
   ci:
