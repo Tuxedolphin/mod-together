@@ -59,9 +59,7 @@
 						}
 					}
 				},
-				() => {
-					console.log('cleanup');
-				}
+				() => {}
 			);
 
 			is_timetable_loaded = true;
@@ -104,5 +102,5 @@
 		</div>
 	</div>
 
-	<ModListGroup currentTimetableDisplay={$currentlySelectedMods}></ModListGroup>
+	<ModListGroup></ModListGroup>
 {/if}
