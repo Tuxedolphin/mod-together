@@ -21,10 +21,6 @@
 		timetable_colour
 	}: TimetableDayProps = $props();
 
-	onMount(() => {
-		console.log(timetable_colour);
-	});
-
 	const spaceAllowedToUse = $derived(100.0 / timeTableDayInfo.outerGroupLength);
 	const startingOuterOffset = $derived(timeTableDayInfo.outerGroupIndex * spaceAllowedToUse);
 	const leftMarginPercentage = $derived(

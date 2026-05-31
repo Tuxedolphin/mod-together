@@ -31,7 +31,6 @@ export async function queryAvailableLessons(
 	const resultingTimetables: TimeTableDayInfo[] = [];
 
 	if (userState.moduleCode === '') return resultingTimetables;
-
 	const modInfo = await getFullModInfo(userState.moduleCode, acadYear);
 	const weekData = modInfo?.semesterData.find((semNo) => semNo.semester == semester);
 	const ttData = weekData?.timetable.filter((x) => x.day == daysOfWeek[day]);
@@ -105,7 +104,32 @@ export async function filterTimetableByDay(
 	return resultingTimetables;
 }
 
-export async function modifyModEntry(
+export function removeModEntry(
+	timetable: TimetableWithMetadata[],
+	acadYear: string,
+	semesterNo: number,
+	id: string,
+	timetableName: string,
+	moduleCode: string
+): TimetableWithMetadata[] {
+	const findTimetableCopy = timetable.filter(
+		(x) =>
+			x.id == id &&
+			x.academicYear == acadYear &&
+			x.semester == semesterNo &&
+			x.name == timetableName
+	)[0];
+	for (let index = findTimetableCopy.metaData.length - 1; index >= 0; index--) {
+		const element = findTimetableCopy.metaData[index];
+		if (element.moduleCode == moduleCode) {
+			findTimetableCopy.metaData.splice(index, 1);
+		}
+	}
+
+	return timetable;
+}
+
+export function modifyModEntry(
 	timetable: TimetableWithMetadata[],
 	acadYear: string,
 	semesterNo: number,
@@ -115,7 +139,7 @@ export async function modifyModEntry(
 	lessonType: string,
 	newlessonNo: string,
 	userState: LessonInfo
-) {
+): TimetableWithMetadata[] {
 	if (moduleCode != userState.moduleCode || lessonType != userState.lessonType) {
 		return timetable;
 	}

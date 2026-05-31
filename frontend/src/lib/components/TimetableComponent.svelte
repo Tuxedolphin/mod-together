@@ -2,6 +2,7 @@
 	import { chooseModState } from '$lib/shared/shared.svelte';
 	import type { TimetableWithMetadata } from '$lib/types/db_raw_types';
 	import { filterTimetableByDay, queryAvailableLessons } from '$lib/utils/format_db_information';
+	import { onDestroy } from 'svelte';
 	import TimetableWeekComponent from './TimetableWeekComponent.svelte';
 
 	const heightOfOneHourLessonPx = 16;
@@ -15,6 +16,14 @@
 		timetable_name: string;
 	}
 	const { timetables, acadYear, semester, timetable_id, timetable_name }: Timetables = $props();
+
+	onDestroy(() => {
+		chooseModState.classNo =
+			chooseModState.colour =
+			chooseModState.lessonType =
+			chooseModState.moduleCode =
+				'';
+	});
 </script>
 
 <div class="grid grid-cols-5 grid-rows-12">

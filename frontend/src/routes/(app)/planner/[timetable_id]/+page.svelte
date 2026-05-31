@@ -3,7 +3,7 @@
 	import SearchBar from '$lib/components/SearchBar.svelte';
 	import Timeline from '$lib/components/Timeline.svelte';
 	import TimetableComponent from '$lib/components/TimetableComponent.svelte';
-	import { preferences, currentlySelectedMods, access_token } from '$lib/shared/shared.svelte';
+	import { currentlySelectedMods, access_token } from '$lib/shared/shared.svelte';
 	import { getTimetable } from '$lib/utils/format_db_information';
 	import { onDestroy, onMount } from 'svelte';
 
@@ -59,9 +59,7 @@
 						}
 					}
 				},
-				() => {
-					console.log('cleanup');
-				}
+				() => {}
 			);
 
 			is_timetable_loaded = true;
@@ -98,11 +96,11 @@
 				timetable_id={timetable_metadata.id}
 				timetable_name={timetable_metadata.name}
 				timetables={currentTimetableDisplay}
-				acadYear={$preferences.acadYear}
-				semester={$preferences.currentSemView}
+				acadYear={timetable_metadata.academicYear}
+				semester={timetable_metadata.semester}
 			></TimetableComponent>
 		</div>
 	</div>
 
-	<ModListGroup currentTimetableDisplay={$currentlySelectedMods}></ModListGroup>
+	<ModListGroup></ModListGroup>
 {/if}
