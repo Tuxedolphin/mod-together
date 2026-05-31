@@ -29,7 +29,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         working-directory: frontend
-      - name: Build & Deploy Worker
+      - name: Build
+        run: pnpm build
+        working-directory: frontend
+      - name: Deploy Worker
         uses: cloudflare/wrangler-action@v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
