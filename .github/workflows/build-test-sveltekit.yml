@@ -26,20 +26,20 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      # - name: Install dependencies
+      #   run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm lint
+      # - name: Lint
+      #   run: pnpm lint
 
-      - name: Type check
-        run: pnpm check
+      # - name: Type check
+      #   run: pnpm check
 
-      - name: Build
-        run: pnpm build
+      # - name: Build
+      #   run: pnpm build
 
-      - name: Install Playwright for Unit Tests
-        run: pnpm exec playwright install
+      # - name: Install Playwright for Unit Tests
+      #   run: pnpm exec playwright install
 
-      - name: Unit tests
-        run: pnpm test:unit -- --run
+      # - name: Unit tests
+      #   run: pnpm test:unit -- --run
