@@ -1,5 +1,3 @@
-/*! 🌼 daisyUI 5.5.20 */
-/*! 🌼 daisyUI 5.5.20 */
 import { writable } from 'svelte/store';
 import * as signalR from '@microsoft/signalr';
 
