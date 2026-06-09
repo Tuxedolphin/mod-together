@@ -1,4 +1,6 @@
 <script lang="ts">
+	import BackgroundTiles from './BackgroundTiles.svelte';
+
 	import { chooseModState } from '$lib/shared/shared.svelte';
 	import type { TimetableWithMetadata } from '$lib/types/db_raw_types';
 	import { filterTimetableByDay, queryAvailableLessons } from '$lib/utils/format_db_information';
@@ -17,6 +19,10 @@
 		timetable_id: string;
 		timetable_name: string;
 	}
+
+	const max_hours_displayed = 12;
+	const max_days_displayed = 5;
+
 	const { timetables, acadYear, semester, timetable_id, timetable_name }: TimetablesProps =
 		$props();
 
@@ -38,7 +44,7 @@
 	onMount(() => {
 		chooseModStateCleanUpFunction = chooseModState.subscribe(async (chooseModState) => {
 			lmao = {};
-			for (let day = 0; day < 5; day++) {
+			for (let day = 0; day < max_days_displayed; day++) {
 				let mods = await queryAvailableLessons(day, semester, acadYear, chooseModState);
 
 				if (mods.length != 0) {
@@ -51,13 +57,10 @@
 
 {#if Object.keys(lmao).length != 0}
 	<div class="grid grid-cols-{Object.keys(lmao).length} grid-rows-12">
-		{#each { length: 12 }, y}
+		{#each { length: max_hours_displayed }, y}
 			{#each { length: Object.keys(lmao).length }, x}
-				<div
-					class="col-start-{x + 1} row-start-{y + 1} h-{heightOfOneHourLessonPx} {y % 2 == 0
-						? 'bg-base-300'
-						: 'bg-base-200'}"
-				></div>
+				<BackgroundTiles {max_hours_displayed} x_cord={x} y_cord={y} {heightOfOneHourLessonPx}
+				></BackgroundTiles>
 			{/each}
 		{/each}
 		{#each Object.entries(lmao) as [day, tt_info], idx (day)}
@@ -75,16 +78,13 @@
 	</div>
 {:else}
 	<div class="grid grid-cols-5 grid-rows-12">
-		{#each { length: 12 }, y}
-			{#each { length: 5 }, x}
-				<div
-					class="col-start-{x + 1} row-start-{y + 1} h-{heightOfOneHourLessonPx} {y % 2 == 0
-						? 'bg-base-300'
-						: 'bg-base-200'}"
-				></div>
+		{#each { length: max_hours_displayed }, y}
+			{#each { length: max_days_displayed }, x}
+				<BackgroundTiles {max_hours_displayed} x_cord={x} y_cord={y} {heightOfOneHourLessonPx}
+				></BackgroundTiles>
 			{/each}
 		{/each}
-		{#each { length: 5 }, day}
+		{#each { length: max_days_displayed }, day}
 			{#await Promise.all( [filterTimetableByDay(day, timetables), queryAvailableLessons(day, semester, acadYear, $chooseModState)] ) then timetableDayInfo}
 				<TimetableWeekComponent
 					{timetable_id}
