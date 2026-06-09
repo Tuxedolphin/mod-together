@@ -10,6 +10,6 @@
 	<a class="btn text-xl btn-ghost">Mods Together!</a>
 </div>
 
-<div class="px-6 pt-2">
+<div class="px-2 pt-2">
 	{@render children()}
 </div>

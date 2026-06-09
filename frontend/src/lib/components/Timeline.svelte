@@ -1,7 +1,8 @@
 <script lang="ts">
 	const timeFormatter = new Intl.DateTimeFormat(undefined, {
 		hour: '2-digit',
-		minute: '2-digit'
+		minute: '2-digit',
+		hour12: false
 	});
 
 	// eslint-disable-next-line svelte/prefer-svelte-reactivity
@@ -12,13 +13,13 @@
 	}
 </script>
 
-<div class="w-20 flex-initial text-center">
+<div class="w-10 flex-initial text-center text-xs">
 	<div class="h-12 align-middle">
-		<p class="relative top-8">{formatShortTime(8)}</p>
+		<p class="relative top-10">{formatShortTime(8)}</p>
 	</div>
 	{#each { length: 12 }, i}
 		<div class="h-16 align-middle">
-			<p class="relative top-12">{formatShortTime(i + 9)}</p>
+			<p class="relative top-14">{formatShortTime(i + 9)}</p>
 		</div>
 	{/each}
 </div>

@@ -70,7 +70,12 @@
 		}
 	}}
 >
-	<div>{timeTableDayInfo.moduleCode} {showModName ? timeTableDayInfo.moduleName : ''}</div>
+	<div class="text-base font-bold">
+		{timeTableDayInfo.moduleCode}
+		{showModName ? timeTableDayInfo.moduleName : ''}
+	</div>
 
-	{timeTableDayInfo.lessonSchedule.lessonType} [{timeTableDayInfo.lessonSchedule.classNo}]
+	<div class="truncate">
+		{timeTableDayInfo.lessonSchedule.lessonType} [{timeTableDayInfo.lessonSchedule.classNo}]
+	</div>
 </button>
