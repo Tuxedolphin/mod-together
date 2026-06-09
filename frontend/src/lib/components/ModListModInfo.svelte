@@ -74,6 +74,8 @@
 							colour
 						)
 					);
+
+					dialog.close();
 				}}
 				class="flex-initial {colour} badge badge-lg"
 			></button>
