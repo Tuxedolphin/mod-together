@@ -119,5 +119,6 @@
 		</div>
 	</div>
 
-	<ModListGroup></ModListGroup>
+	<ModListGroup acadYear={timetable_metadata.academicYear} timetables={currentTimetableDisplay}
+	></ModListGroup>
 {/if}
