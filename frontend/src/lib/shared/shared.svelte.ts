@@ -24,11 +24,11 @@ export const access_token = persisted('ac:tok', {
 
 export const currentUserInformation = persisted('user', {} as UserInfo);
 
-export const chooseModState = $state({
+export const chooseModState = writable({
 	moduleCode: '',
 	lessonType: '',
 	classNo: ''
-}) as LessonInfo;
+} as LessonInfo);
 
 export const searchTerm = writable('');
 

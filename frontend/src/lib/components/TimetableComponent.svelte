@@ -7,7 +7,7 @@
 
 	const heightOfOneHourLessonPx = 16;
 
-	interface Timetables {
+	interface TimetablesProps {
 		timetables: TimetableWithMetadata[];
 		acadYear: string;
 		semester: number;
@@ -15,14 +15,16 @@
 		timetable_id: string;
 		timetable_name: string;
 	}
-	const { timetables, acadYear, semester, timetable_id, timetable_name }: Timetables = $props();
+	const { timetables, acadYear, semester, timetable_id, timetable_name }: TimetablesProps =
+		$props();
 
 	onDestroy(() => {
-		chooseModState.classNo =
-			chooseModState.colour =
-			chooseModState.lessonType =
-			chooseModState.moduleCode =
-				'';
+		$chooseModState = {
+			classNo: '',
+			colour: '',
+			lessonType: '',
+			moduleCode: ''
+		};
 	});
 </script>
 
@@ -37,7 +39,7 @@
 		{/each}
 	{/each}
 	{#each { length: 5 }, day}
-		{#await Promise.all( [filterTimetableByDay(day, timetables), queryAvailableLessons(day, semester, acadYear, chooseModState)] ) then timetableDayInfo}
+		{#await Promise.all( [filterTimetableByDay(day, timetables), queryAvailableLessons(day, semester, acadYear, $chooseModState)] ) then timetableDayInfo}
 			<TimetableWeekComponent
 				{timetable_id}
 				{timetable_name}

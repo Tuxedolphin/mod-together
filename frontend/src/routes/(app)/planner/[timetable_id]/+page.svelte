@@ -102,7 +102,13 @@
 	<div class="flex">
 		<Timeline></Timeline>
 		<div class="flex-1 flex-col">
-			<DaysOfWeekHeader></DaysOfWeekHeader>
+			<DaysOfWeekHeader
+				timetable_id={timetable_metadata.id}
+				timetable_name={timetable_metadata.name}
+				timetables={currentTimetableDisplay}
+				acadYear={timetable_metadata.academicYear}
+				semester={timetable_metadata.semester}
+			></DaysOfWeekHeader>
 			<TimetableComponent
 				timetable_id={timetable_metadata.id}
 				timetable_name={timetable_metadata.name}

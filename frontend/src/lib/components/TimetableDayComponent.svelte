@@ -40,11 +40,13 @@
 		timeTableDayInfo.normalisedStartDuration *
 			192} border {timetable_colour} text-xs wrap-break-word text-black"
 	onclick={async () => {
-		if (chooseModState.lessonType === '') {
-			chooseModState.lessonType = timeTableDayInfo.lessonSchedule.lessonType;
-			chooseModState.moduleCode = timeTableDayInfo.moduleCode;
-			chooseModState.classNo = timeTableDayInfo.lessonSchedule.classNo;
-			chooseModState.colour = timetable_colour;
+		if ($chooseModState.lessonType === '') {
+			$chooseModState = {
+				lessonType: timeTableDayInfo.lessonSchedule.lessonType,
+				moduleCode: timeTableDayInfo.moduleCode,
+				classNo: timeTableDayInfo.lessonSchedule.classNo,
+				colour: timetable_colour
+			};
 		} else {
 			currentlySelectedMods.set(
 				await modifyModEntry(
@@ -56,13 +58,15 @@
 					timeTableDayInfo.moduleCode,
 					timeTableDayInfo.lessonSchedule.lessonType,
 					timeTableDayInfo.lessonSchedule.classNo,
-					chooseModState
+					$chooseModState
 				)
 			);
-			chooseModState.lessonType = '';
-			chooseModState.moduleCode = '';
-			chooseModState.classNo = '';
-			chooseModState.colour = '';
+			$chooseModState = {
+				classNo: '',
+				colour: '',
+				lessonType: '',
+				moduleCode: ''
+			};
 		}
 	}}
 >
