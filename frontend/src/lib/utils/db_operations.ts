@@ -15,6 +15,7 @@ import { Err, Ok, type Result } from 'ts-results-es';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { access_token } from '$lib/shared/shared.svelte';
+import { getFromSessionStorage, storeInfoSessionStorage } from './fetch_from_cache';
 
 const apiCalls = ky.create({
 	baseUrl: PUBLIC_DB_LINK
@@ -140,6 +141,11 @@ export async function put_user_info(
 export async function get_user_info(
 	access_token: string
 ): Promise<Result<UserProfileResponse, string>> {
+	const cache = getFromSessionStorage("user_info")
+
+	if (cache.isOk()) {
+		return Ok(cache.value as UserProfileResponse)
+	}
 	try {
 		const get_user_info_db = create_ky_instance({
 			authorised: true,
@@ -147,6 +153,8 @@ export async function get_user_info(
 			auth_token: access_token
 		});
 		const timetables = await get_user_info_db.get('profile/me').json<UserProfileResponse>();
+
+		storeInfoSessionStorage("user_info", timetables);
 		return Ok(timetables);
 	} catch (error) {
 		try {

@@ -11,5 +11,5 @@
 </div>
 
 <GenericDialog bind:dialog>
-	<div>Hello</div>
+	<div></div>
 </GenericDialog>
