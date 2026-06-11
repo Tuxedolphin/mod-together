@@ -60,16 +60,16 @@
 {#if length_of_lmao != 0}
 	<div class="grid grid-cols-{length_of_lmao} gap-0 text-center">
 		{#each Object.entries(lmao) as [day, tt_info] (day)}
-			<div class="h-12 bg-base-200">
-				{formatShortDate(daysOfWeek[Number.parseInt(day) + 1])}
+			<div class="flex h-6 items-center bg-base-200 text-xs">
+				<p class="w-full text-center">{formatShortDate(daysOfWeek[Number.parseInt(day) + 1])}</p>
 			</div>
 		{/each}
 	</div>
 {:else}
-	<div class="grid grid-cols-5 gap-0 text-center">
+	<div class="grid grid-cols-5 gap-0">
 		{#each { length: 5 }, day}
-			<div class="h-12 bg-base-200">
-				{formatShortDate(daysOfWeek[day + 1])}
+			<div class="flex h-6 items-center bg-base-200 text-xs">
+				<p class="w-full text-center">{formatShortDate(daysOfWeek[day + 1])}</p>
 			</div>
 		{/each}
 	</div>

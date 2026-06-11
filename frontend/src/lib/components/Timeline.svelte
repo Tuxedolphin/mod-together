@@ -15,11 +15,11 @@
 
 <div class="w-10 flex-initial text-center text-xs">
 	<div class="h-12 align-middle">
-		<p class="relative top-10">{formatShortTime(8)}</p>
+		<p class="relative top-4">{formatShortTime(8)}</p>
 	</div>
 	{#each { length: 12 }, i}
 		<div class="h-16 align-middle">
-			<p class="relative top-14">{formatShortTime(i + 9)}</p>
+			<p class="relative top-8">{formatShortTime(i + 9)}</p>
 		</div>
 	{/each}
 </div>
