@@ -15,7 +15,6 @@ import { Err, Ok, type Result } from 'ts-results-es';
 import { goto } from '$app/navigation';
 import { resolve } from '$app/paths';
 import { token_information, currentUserInformation } from '$lib/shared/shared.svelte';
-import { getFromSessionStorage, storeInfoSessionStorage } from './fetch_from_cache';
 import { get } from 'svelte/store';
 
 const apiCalls = ky.create({

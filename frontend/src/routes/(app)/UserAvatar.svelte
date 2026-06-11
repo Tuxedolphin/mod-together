@@ -1,5 +1,8 @@
 <script lang="ts">
+	import { currentUserInformation, token_information } from '$lib/shared/shared.svelte';
 	import GenericDialog from './GenericDialog.svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	let dialog: HTMLDialogElement;
 </script>
@@ -11,5 +14,15 @@
 </div>
 
 <GenericDialog bind:dialog>
-	<div></div>
+	<h3 class="text-lg font-bold">Hi, {$currentUserInformation.username}</h3>
+
+	<button
+		class="btn btn-error"
+		onclick={async () => {
+			$token_information.a = '';
+			currentUserInformation.reset();
+			const message = 'Logout Successful';
+			goto(resolve(`/login#error_description=${message}`));
+		}}>Logout</button
+	>
 </GenericDialog>

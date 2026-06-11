@@ -19,19 +19,10 @@
 </script>
 
 {#if token}
-	<div class="mx-0.5 flex flex-col pt-2 pb-4 lg:flex-row lg:justify-between">
+	<div class="mx-0.5 flex items-center justify-between pt-2 pb-4">
 		<GreetingComponent access_token={token}></GreetingComponent>
 		<div class="flex gap-2">
 			<CreateNewTimetableButton></CreateNewTimetableButton>
-			<button
-				class="btn btn-error"
-				onclick={async () => {
-					$token_information.a = '';
-					currentUserInformation.reset();
-					const message = 'Logout Successful';
-					goto(resolve(`/login#error_description=${message}`));
-				}}>Logout</button
-			>
 		</div>
 	</div>
 

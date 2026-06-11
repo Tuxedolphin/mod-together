@@ -4,6 +4,7 @@
 	import { token_information } from '$lib/shared/shared.svelte';
 	import { create_empty_timetable } from '$lib/utils/db_operations';
 	import { format_semester_name } from '$lib/utils/formatting_utils';
+	import { CirclePlus } from '@lucide/svelte';
 	import GenericDialog from '../GenericDialog.svelte';
 
 	let dialog: HTMLDialogElement;
@@ -26,8 +27,8 @@
 	}
 </script>
 
+<CirclePlus size={32} class="cursor-pointer" onclick={() => dialog.show()}></CirclePlus>
 <!-- Open the modal using ID.showModal() method -->
-<button class="btn btn-primary" onclick={() => dialog.showModal()}>Create new timetable</button>
 
 <GenericDialog bind:dialog>
 	<h3 class="text-lg font-bold">Create new timetable</h3>

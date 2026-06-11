@@ -19,7 +19,9 @@ export const token_information = persisted('xhnus', {
 	b: false
 } as AccessTokenInfo);
 
-export const currentUserInformation = persisted('clrsnus', {} as UserProfileResponse, {
+export const currentUserInformation = persisted('clrsnus', {
+	username: ''
+} as UserProfileResponse, {
 	storage: 'session'
 });
 
