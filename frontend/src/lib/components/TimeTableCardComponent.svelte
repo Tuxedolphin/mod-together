@@ -4,7 +4,11 @@
 	import { timetable_list_should_be_refreshed } from '$lib/shared/shared.svelte';
 	import type { TimetableInfo } from '$lib/types/db_raw_types';
 	import { delete_timetable_by_id } from '$lib/utils/db_operations';
-	import { format_semester_name } from '$lib/utils/formatting_utils';
+	import {
+		format_AY_name,
+		format_created_time,
+		format_semester_name
+	} from '$lib/utils/formatting_utils';
 	import { EllipsisVertical } from '@lucide/svelte';
 	import GenericDialog from '../../routes/(app)/GenericDialog.svelte';
 
@@ -38,10 +42,15 @@
 				<EllipsisVertical></EllipsisVertical>
 			</button>
 		</div>
-		<div class="flex justify-between">
-			<div>AY{timetable.academicYear}</div>
-			<div>{format_semester_name(timetable.semester)}</div>
+
+		<div class="me-2.5 text-end text-base">
+			{format_AY_name(timetable.academicYear)},
+			{format_semester_name(timetable.semester)}
 		</div>
+		<div class="me-2.5 text-end text-base opacity-50">
+			Created: {format_created_time(timetable.createdAt)}
+		</div>
+
 		<p class="font-bold"></p>
 
 		<div class="card-actions justify-end"></div>
