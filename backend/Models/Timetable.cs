@@ -18,6 +18,7 @@ public class TimetableModule
     public required string Colour { get; set; } = string.Empty;
 }
 
+// Note that this is used in DTOs as well, so any sensitive fields should be hidden
 public class Timetable
 {
     public required Guid Id { get; set; }
