@@ -77,7 +77,7 @@ public class RoomHub(ILogger<RoomHub> logger, IRoomService roomService, IRoomTra
         return _roomTracker.GetAllRoomInformation();
     }
 
-    public async Task updateTimetable(Guid timetableId, Timetable timetable) { }
+    public async Task UpdateTimetable(Guid timetableId, Timetable timetable) { }
 
     // This method is used mainly as a placeholder for testing, but it could be used in the future
     // to send a message as a chat feature

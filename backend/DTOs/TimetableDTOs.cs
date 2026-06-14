@@ -13,6 +13,13 @@ public class TimetableSummaryResponse
     public required DateTime CreatedAt { get; set; }
 }
 
+// Similar to time table, but with an additional user field (replaces the userId in the original db)
+// Take note that only id is hidden, and all other information are exposed
+public class TimetableDetailedResponse : Timetable
+{
+    public required Profile Profile { get; set; }
+}
+
 public class CreateTimetableRequest
 {
     [Required]
@@ -35,5 +42,5 @@ public class UpdateTimetableRequest
     public string Name { get; set; } = string.Empty;
 
     [Required]
-    public List<TimetableModule> MetaData { get; set; } = [];
+    public IReadOnlyCollection<TimetableModule> MetaData { get; set; } = [];
 }
