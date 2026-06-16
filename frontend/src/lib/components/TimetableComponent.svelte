@@ -95,6 +95,7 @@
 		{#each { length: max_days_displayed }, day}
 			{#await Promise.all( [filterTimetableByDay(day, timetables), queryAvailableLessons(day, semester, acadYear, $chooseModState)] ) then timetableDayInfo}
 				<TimetableWeekComponent
+					{height_of_one_hour_lesson}
 					{timetable_id}
 					{timetable_name}
 					timetableDayDisplayInfo={timetableDayInfo.flat()}

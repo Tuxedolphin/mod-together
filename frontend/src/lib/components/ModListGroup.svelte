@@ -25,7 +25,7 @@
 	});
 </script>
 
-<div class="grid grid-cols-1 gap-4 p-1 lg:grid-cols-3">
+<div class="grid gap-4 p-1">
 	{#each updated_mod_list as tt (tt.id)}
 		<ModListModInfo timetable={tt} {acadYear}></ModListModInfo>
 	{/each}
