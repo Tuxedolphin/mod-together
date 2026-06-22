@@ -3,21 +3,23 @@ using Backend.Models;
 
 namespace Backend.DTOs;
 
-public class TimetableSummaryResponse
+public record TimetableSummaryResponse
 {
-    public required Guid Id { get; set; }
-
-    public required string Name { get; set; }
-    public required int Semester { get; set; }
-    public required string AcademicYear { get; set; }
-    public required DateTime CreatedAt { get; set; }
+    public required Guid Id { get; init; }
+    public required string Name { get; init; }
+    public required int Semester { get; init; }
+    public required string AcademicYear { get; init; }
+    public required DateTime CreatedAt { get; init; }
 }
 
-// Similar to time table, but with an additional user field (replaces the userId in the original db)
-// Take note that only id is hidden, and all other information are exposed
-public class TimetableDetailedResponse : Timetable
+public record TimetableResponse : TimetableSummaryResponse
 {
-    public required Profile Profile { get; set; }
+    public required List<TimetableModule> MetaData { get; init; }
+}
+
+public record TimetableDetailedResponse : TimetableResponse
+{
+    public required Profile Profile { get; init; }
 }
 
 public class CreateTimetableRequest
