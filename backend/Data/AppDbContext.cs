@@ -7,13 +7,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<Timetable> Timetables { get; set; } = null!;
     public DbSet<Profile> Profiles { get; set; } = null!;
+    public DbSet<Room> Rooms { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Timetable>().ToTable("TimeTables");
         modelBuilder.Entity<Profile>().ToTable("Profiles", t => t.ExcludeFromMigrations());
+
+        modelBuilder.Entity<Timetable>().ToTable("TimeTables");
         modelBuilder
             .Entity<Timetable>()
             .HasOne<Profile>()
@@ -27,5 +29,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .Property(t => t.CreatedAt)
             .ValueGeneratedOnAdd()
             .HasDefaultValueSql("now()");
+
+        modelBuilder
+            .Entity<Timetable>()
+            .HasOne(t => t.OriginalTimetable)
+            .WithMany()
+            .HasForeignKey(t => t.OriginalTimetableId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<Room>().ToTable("Rooms");
     }
 }
