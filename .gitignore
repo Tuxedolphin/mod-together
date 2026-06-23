@@ -24,8 +24,8 @@ Session.vim
 # =========================
 # Backend
 # =========================
-backend/bin/
-backend/obj/
+**/obj/
+**/bin/
 backend/TestResults/
 backend/logs/
 
