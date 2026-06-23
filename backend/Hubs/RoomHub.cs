@@ -106,7 +106,7 @@ public class RoomHub(
             // (i.e. no user left)
         }
 
-        await _roomService.CommitChanges(roomId);
+        await _roomService.CommitChangesAsync(roomId);
     }
 
     public async Task<RoomInformation> GetRoomInformation(Guid roomId)
@@ -154,7 +154,7 @@ public class RoomHub(
     }
 
     public async Task UpdateTimetable(Guid timetableId, UpdateTimetableRequest timetableRequest) =>
-        await _roomService.HandleUpdateTimetable(
+        await _roomService.HandleUpdateTimetableAsync(
             GetCurrentRoomId(GetUserId()),
             timetableId,
             timetableRequest

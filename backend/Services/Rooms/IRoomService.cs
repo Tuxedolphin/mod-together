@@ -23,7 +23,7 @@ public interface IRoomService
 
     // We do not check for the userId here for auth since all users in the room should be able to update any of the timetables
     // TODO: Maybe add in some auth feature so that some people can "lock" their timetable
-    public Task<bool> HandleUpdateTimetable(
+    public Task<bool> HandleUpdateTimetableAsync(
         Guid roomId,
         Guid timetableId,
         UpdateTimetableRequest timetableRequest
@@ -36,5 +36,5 @@ public interface IRoomService
     );
 
     public bool CloseRoom(Guid roomId);
-    public Task<bool> CommitChanges(Guid roomId);
+    public Task<bool> CommitChangesAsync(Guid roomId);
 }

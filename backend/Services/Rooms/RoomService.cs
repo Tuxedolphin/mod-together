@@ -130,7 +130,7 @@ public class RoomService(
         return CreateTimetableResult.Success;
     }
 
-    public async Task<bool> HandleUpdateTimetable(
+    public async Task<bool> HandleUpdateTimetableAsync(
         Guid roomId,
         Guid timetableId,
         UpdateTimetableRequest timetableRequest
@@ -196,7 +196,7 @@ public class RoomService(
         // TODO: Add logging
     }
 
-    public async Task<bool> CommitChanges(Guid roomId)
+    public async Task<bool> CommitChangesAsync(Guid roomId)
     {
         try
         {
