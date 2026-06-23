@@ -3,8 +3,8 @@ using Backend.Exceptions;
 using Backend.Hubs;
 using Backend.Services.Auth;
 using Backend.Services.Profiles;
-using Backend.Services.Room;
-using Backend.Services.TimeTables;
+using Backend.Services.Rooms;
+using Backend.Services.Timetables;
 using Backend.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -73,11 +73,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // === Application Services ===
 
-builder.Services.AddScoped<ITimeTableService, TimeTableService>();
+builder.Services.AddScoped<ITimetableService, TimetableService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddSingleton<IRoomTracker, RoomTracker>();
+builder.Services.AddSingleton<IProfileTracker, ProfileTracker>();
 
 // === Default setup ===
 

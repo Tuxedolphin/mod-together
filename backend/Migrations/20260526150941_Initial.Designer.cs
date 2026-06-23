@@ -37,7 +37,7 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<List<TimeTableModule>>("MetaData")
+                    b.Property<List<TimetableModule>>("MetaData")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
