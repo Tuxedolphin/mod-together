@@ -17,14 +17,14 @@ namespace Backend.Migrations
                 table: "TimeTables",
                 type: "jsonb",
                 nullable: true,
-                oldClrType: typeof(List<TimeTableModule>),
+                oldClrType: typeof(List<TimetableModule>),
                 oldType: "jsonb");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<List<TimeTableModule>>(
+            migrationBuilder.AlterColumn<List<TimetableModule>>(
                 name: "MetaData",
                 table: "TimeTables",
                 type: "jsonb",

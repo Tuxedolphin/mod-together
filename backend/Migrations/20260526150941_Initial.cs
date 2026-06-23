@@ -22,7 +22,7 @@ namespace Backend.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Semester = table.Column<int>(type: "integer", nullable: false),
                     AcademicYear = table.Column<string>(type: "text", nullable: false),
-                    MetaData = table.Column<List<TimeTableModule>>(type: "jsonb", nullable: false)
+                    MetaData = table.Column<List<TimetableModule>>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {
