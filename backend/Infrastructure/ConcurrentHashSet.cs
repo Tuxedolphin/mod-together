@@ -8,6 +8,17 @@ public class ConcurrentHashSet<T> : IReadOnlyCollection<T>
 {
     private readonly ConcurrentDictionary<T, byte> _dict = new();
 
+    public ConcurrentHashSet(IEnumerable<T>? set)
+    {
+        if (set == null)
+            return;
+
+        _dict = new ConcurrentDictionary<T, byte>(set.ToDictionary(t => t, _ => default(byte)));
+    }
+
+    public ConcurrentHashSet()
+        : this(null) { }
+
     public bool Add(T item) => _dict.TryAdd(item, 0);
 
     public bool Remove(T item) => _dict.TryRemove(item, out _);

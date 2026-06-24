@@ -1,9 +1,12 @@
 using Backend.DTOs;
+using Backend.Models;
 
 namespace Backend.Hubs.Clients;
 
 public interface IRoomHubClient
 {
-    public Task RoomCreated(RoomInformation information);
-    public Task ReceiveMessage(MessageResponse response);
+    Task ReceiveMessage(MessageResponse response);
+
+    Task ReceiveTimetableUpdate(IReadOnlyCollection<TimetableDetailedResponse> timetables);
+    Task ReceiveUserUpdate(IReadOnlyCollection<Profile> profiles);
 }

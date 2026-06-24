@@ -42,7 +42,7 @@ namespace Backend.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<List<TimeTableModule>>("MetaData")
+                    b.Property<List<TimetableModule>>("MetaData")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
