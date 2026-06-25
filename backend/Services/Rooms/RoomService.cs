@@ -27,13 +27,13 @@ public class RoomService(
         return _roomTracker.RoomExists(roomId);
     }
 
-    public bool CreateOrJoinRoom(Guid userId, Guid roomId)
+    public async Task<bool> CreateOrJoinRoom(Guid userId, Guid roomId)
     {
         if (!_roomTracker.RoomExists(roomId))
             _roomTracker.AddRoom(roomId);
 
         if (_roomTracker.GetRoomOfUser(userId, out Guid oldRoomId) && oldRoomId != roomId)
-            HandleLeaveRoom(userId, oldRoomId);
+            await HandleLeaveRoom(userId, oldRoomId);
 
         if (_roomTracker.AddUserToRoom(userId, roomId))
             return true;
@@ -42,14 +42,15 @@ public class RoomService(
         return false;
     }
 
-    public bool HandleLeaveRoom(Guid userId, Guid roomId)
+    public async Task<bool> HandleLeaveRoom(Guid userId, Guid roomId)
     {
         if (_roomTracker.RemoveUserFromRoom(userId, roomId))
         {
             if (_roomTracker.GetUsersInRoom(roomId, out var users) && users.Count > 0)
                 return true;
 
-            CloseRoom(roomId);
+            // If there are no more users in the room
+            await CloseRoom(roomId);
         }
 
         RoomServiceLogs.LogAttemptedLeaveNonExistentRoom(_logger, roomId, userId);
@@ -60,6 +61,8 @@ public class RoomService(
     {
         var profilesOfUsers = await GetProfilesInRoomAsync(roomId);
         var timetablesInformation = await GetTimetablesDetailedInRoomAsync(roomId);
+
+        // BUG: Should query database for info
 
         if (profilesOfUsers is null || timetablesInformation is null)
             return null;
@@ -171,11 +174,12 @@ public class RoomService(
         return profile;
     }
 
-    public bool CloseRoom(Guid roomId)
+    public async Task<bool> CloseRoom(Guid roomId)
     {
         if (!_roomTracker.GetUsersInRoom(roomId, out var users))
             return false;
 
+        await CommitChangesAsync(roomId);
         return _profileTracker.RemoveUsers(users) && _roomTracker.CloseRoom(roomId);
     }
 
