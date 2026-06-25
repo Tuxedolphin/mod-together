@@ -157,15 +157,6 @@ public class RoomTracker : IRoomTracker
                 });
         }
 
-        if (roomState?.Timetables.IsEmpty == false)
-        {
-            roomState
-                .Timetables.Keys.ToList()
-                .ForEach(timetableId => _changedTimetables.Remove(timetableId));
-
-            roomState.Timetables.TryRemove(roomId, out _);
-        }
-
         // We don't silently fail, even though the behaviour is the same, for logging purposes
         return success;
     }

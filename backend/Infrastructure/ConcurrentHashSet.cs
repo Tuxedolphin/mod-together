@@ -13,7 +13,9 @@ public class ConcurrentHashSet<T> : IReadOnlyCollection<T>
         if (set == null)
             return;
 
-        _dict = new ConcurrentDictionary<T, byte>(set.ToDictionary(t => t, _ => default(byte)));
+        _dict = new ConcurrentDictionary<T, byte>(
+            set.Distinct().ToDictionary(t => t, _ => default(byte))
+        );
     }
 
     public ConcurrentHashSet()

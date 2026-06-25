@@ -88,6 +88,7 @@ public class RoomHub(
     public async Task LeaveRoom(Guid roomId)
     {
         var userId = GetUserId();
+
         _roomService.HandleLeaveRoom(userId, roomId);
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId.ToString());
