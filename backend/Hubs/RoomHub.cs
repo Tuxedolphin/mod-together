@@ -88,6 +88,9 @@ public class RoomHub(
     public async Task LeaveRoom(Guid roomId)
     {
         var userId = GetUserId();
+
+        await _roomService.CommitChangesAsync(roomId);
+
         _roomService.HandleLeaveRoom(userId, roomId);
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId.ToString());
@@ -102,8 +105,6 @@ public class RoomHub(
             // We ignore the error here, since the room may have been deleted after the user left
             // (i.e. no user left)
         }
-
-        await _roomService.CommitChangesAsync(roomId);
     }
 
     public async Task<RoomInformation> GetRoomInformation(Guid roomId)
