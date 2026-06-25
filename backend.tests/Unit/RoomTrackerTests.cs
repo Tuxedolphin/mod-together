@@ -370,8 +370,18 @@ public class RoomTrackerTests
         _tracker.AddRoom(roomId);
         _tracker.AddOrUpdateTimetable(timetable);
 
-        timetable.Name = changedName;
-        _tracker.AddOrUpdateTimetable(timetable);
+        var updated = new Timetable
+        {
+            Id = timetable.Id,
+            Name = changedName,
+            RoomId = timetable.RoomId,
+            UserId = timetable.UserId,
+            Semester = timetable.Semester,
+            AcademicYear = timetable.AcademicYear,
+            CreatedAt = timetable.CreatedAt,
+            MetaData = [],
+        };
+        _tracker.AddOrUpdateTimetable(updated);
 
         var result = _tracker.GetTimetableById(roomId, timetable.Id);
 
@@ -482,6 +492,23 @@ public class RoomTrackerTests
         success.ShouldBeTrue();
 
         _tracker.GetDeletedTimetables(roomId).Contains(timetable.Id).ShouldBeTrue();
+    }
+
+    [Fact]
+    public void DeleteTimetable_TimetablePreviouslyChanged_RemovesFromChangedAndAddsToDeleted()
+    {
+        var roomId = Guid.NewGuid();
+        var timetable = MakeTimetable(roomId);
+
+        _tracker.AddRoom(roomId);
+        _tracker.AddOrUpdateTimetable(timetable);
+
+        _tracker.DeleteTimetable(roomId, timetable.Id);
+
+        _tracker.GetDeletedTimetables(roomId).ShouldContain(timetable.Id);
+
+        _tracker.GetChangedTimetables(roomId, out var changed);
+        changed.ShouldNotContain(timetable);
     }
 
     // === SetRoom ===
@@ -663,7 +690,7 @@ public class RoomTrackerTests
     }
 
     [Fact]
-    public void RemoveTimetablesFromChanged_RemoveFilledFromEmptyList_ReturnsOriginal()
+    public void RemoveTimetablesFromChanged_InputHasIds_ButChangedSetIsEmpty_ReturnsInputUnchanged()
     {
         IReadOnlyCollection<Guid> timetables = [Guid.NewGuid(), Guid.NewGuid()];
 
@@ -758,7 +785,7 @@ public class RoomTrackerTests
         _tracker.DeleteTimetable(roomId, timetables.ElementAt(0).Id);
         _tracker.DeleteTimetable(roomId, timetables.ElementAt(1).Id);
 
-        var res = _tracker.RemoveTimetablesFromChanged([timetables.ElementAt(0).Id]);
+        var res = _tracker.RemoveTimetablesFromDeleted(roomId, [timetables.ElementAt(0).Id]);
         res.ShouldBeEmpty();
 
         _tracker.RemoveTimetablesFromDeleted(roomId, [timetables.ElementAt(0).Id]);
