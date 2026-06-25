@@ -1,6 +1,7 @@
 using Backend.DTOs;
 using Backend.DTOs.Mappings;
 using Backend.Models;
+using Backend.Services.Rooms;
 using Shouldly;
 
 namespace Backend.Tests.Unit;

@@ -3,6 +3,7 @@ using Backend.DTOs;
 using Backend.DTOs.Mappings;
 using Backend.Exceptions;
 using Backend.Models;
+using Backend.Services.Rooms;
 using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Services.Timetables;

@@ -1,4 +1,5 @@
 using Backend.Models;
+using Backend.Services.Rooms;
 
 namespace Backend.DTOs.Mappings;
 
