@@ -1,5 +1,9 @@
 import type { LessonInfo } from '$lib/shared/shared.svelte';
-import type { TimetableModule, TimetableResponse } from '$lib/types/db_raw_types';
+import type {
+	TimetableDetailedResponse,
+	TimetableModule,
+	TimetableResponse
+} from '$lib/types/db_raw_types';
 import type { TimeTableDayInfo } from '$lib/types/internal';
 import type { RawLesson } from '$lib/types/modules';
 
@@ -50,7 +54,7 @@ export async function queryAvailableLessons(
 				outerGroupIndex: -1,
 				outerGroupLength: -1,
 				timetableColour: userState.colour,
-				timetableId: ''
+				timetableId: userState.selectedTimetableId
 			});
 		}
 	}
@@ -107,19 +111,14 @@ export async function filterTimetableByDay(
 }
 
 export function removeModEntry(
-	timetable: TimetableResponse[],
+	timetable: TimetableDetailedResponse[],
 	acadYear: string,
 	semesterNo: number,
 	id: string,
-	timetableName: string,
 	moduleCode: string
-): TimetableResponse[] {
+): TimetableDetailedResponse[] {
 	const findTimetableCopy = timetable.filter(
-		(x) =>
-			x.id == id &&
-			x.academicYear == acadYear &&
-			x.semester == semesterNo &&
-			x.name == timetableName
+		(x) => x.id == id && x.academicYear == acadYear && x.semester == semesterNo
 	)[0];
 	for (let index = findTimetableCopy.metaData.length - 1; index >= 0; index--) {
 		const element = findTimetableCopy.metaData[index];
@@ -132,20 +131,15 @@ export function removeModEntry(
 }
 
 export function modifyModColour(
-	timetable: TimetableResponse[],
+	timetable: TimetableDetailedResponse[],
 	acadYear: string,
 	semesterNo: number,
 	id: string,
-	timetableName: string,
 	moduleCode: string,
 	newColor: string
-): TimetableResponse[] {
+): TimetableDetailedResponse[] {
 	const findTimetableCopy = timetable.filter(
-		(x) =>
-			x.id == id &&
-			x.academicYear == acadYear &&
-			x.semester == semesterNo &&
-			x.name == timetableName
+		(x) => x.id == id && x.academicYear == acadYear && x.semester == semesterNo
 	)[0];
 
 	const lessonRef = findTimetableCopy.metaData.filter((x) => x.moduleCode == moduleCode)!;
@@ -158,25 +152,20 @@ export function modifyModColour(
 	return timetable;
 }
 export function modifyModEntry(
-	timetable: TimetableResponse[],
+	timetable: TimetableDetailedResponse[],
 	acadYear: string,
 	semesterNo: number,
 	id: string,
-	timetableName: string,
 	moduleCode: string,
 	lessonType: string,
 	newlessonNo: string,
 	userState: LessonInfo
-): TimetableResponse[] {
+): TimetableDetailedResponse[] {
 	if (moduleCode != userState.moduleCode || lessonType != userState.lessonType) {
 		return timetable;
 	}
 	const findTimetableCopy = timetable.filter(
-		(x) =>
-			x.id == id &&
-			x.academicYear == acadYear &&
-			x.semester == semesterNo &&
-			x.name == timetableName
+		(x) => x.id == id && x.academicYear == acadYear && x.semester == semesterNo
 	)[0];
 	const lessonRef = findTimetableCopy.metaData.find(
 		(x) =>
@@ -191,19 +180,14 @@ export function modifyModEntry(
 }
 
 export function checkModAlreadyAdded(
-	timetable: TimetableResponse[],
+	timetable: TimetableDetailedResponse[],
 	acadYear: string,
 	semesterNo: number,
 	id: string,
-	timetableName: string,
 	moduleCode: string
 ): boolean {
 	const findTimetableCopy = timetable.filter(
-		(x) =>
-			x.id == id &&
-			x.academicYear == acadYear &&
-			x.semester == semesterNo &&
-			x.name == timetableName
+		(x) => x.id == id && x.academicYear == acadYear && x.semester == semesterNo
 	);
 
 	if (findTimetableCopy.length == 0) return false;
@@ -212,20 +196,15 @@ export function checkModAlreadyAdded(
 }
 
 export async function createModEntry(
-	timetable: TimetableResponse[],
+	timetable: TimetableDetailedResponse[],
 	acadYear: string,
 	semesterNo: number,
 	id: string,
-	timetableName: string,
 	moduleCode: string,
 	rawLesson: RawLesson[]
-): Promise<TimetableResponse[]> {
+): Promise<TimetableDetailedResponse[]> {
 	const findTimetableCopy = timetable.filter(
-		(x) =>
-			x.id == id &&
-			x.academicYear == acadYear &&
-			x.semester == semesterNo &&
-			x.name == timetableName
+		(x) => x.id == id && x.academicYear == acadYear && x.semester == semesterNo
 	);
 	const lessonDataRef: TimetableModule[] = [];
 

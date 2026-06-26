@@ -38,7 +38,9 @@ export const currentWorkingTimetable = persisted('erixnus', '', {
 export const chooseModState = writable({
 	moduleCode: '',
 	lessonType: '',
-	classNo: ''
+	classNo: '',
+	colour: '',
+	selectedTimetableId: ''
 } as LessonInfo);
 
 export const searchTerm = writable('');
@@ -48,4 +50,5 @@ export interface LessonInfo {
 	lessonType: string;
 	classNo: string;
 	colour: string;
+	selectedTimetableId: string;
 }

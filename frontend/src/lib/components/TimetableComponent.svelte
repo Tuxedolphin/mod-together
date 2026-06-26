@@ -27,7 +27,8 @@
 			classNo: '',
 			colour: '',
 			lessonType: '',
-			moduleCode: ''
+			moduleCode: '',
+			selectedTimetableId: ''
 		};
 
 		chooseModStateCleanUpFunction();

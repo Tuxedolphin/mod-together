@@ -27,7 +27,6 @@
 	{#each filteredInformation as timetableDayInfo (timetableDayInfo)}
 		<TimetableDayComponent
 			timetable_id={timetableDayInfo.timetableId}
-			timetable_name=""
 			{height_of_one_hour_lesson}
 			timetable_colour={timetableDayInfo.timetableColour}
 			timeTableDayInfo={timetableDayInfo}

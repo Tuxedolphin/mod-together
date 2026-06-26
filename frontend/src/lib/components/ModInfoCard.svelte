@@ -48,7 +48,6 @@
 									timetable.academicYear,
 									timetable.semester,
 									timetable.id,
-									timetable.name,
 									lesson_groups[lesson_header]![0].moduleCode
 								)
 							);

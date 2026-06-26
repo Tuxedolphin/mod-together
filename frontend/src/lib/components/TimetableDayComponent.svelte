@@ -8,7 +8,6 @@
 		semester: number;
 		acadYear: string;
 		timetable_id: string;
-		timetable_name: string;
 		timetable_colour: string;
 		height_of_one_hour_lesson: number;
 	}
@@ -17,7 +16,6 @@
 		acadYear,
 		semester,
 		timetable_id,
-		timetable_name,
 		timetable_colour,
 		height_of_one_hour_lesson
 	}: TimetableDayProps = $props();
@@ -37,7 +35,8 @@
 				lessonType: timeTableDayInfo.lessonSchedule.lessonType,
 				moduleCode: timeTableDayInfo.moduleCode,
 				classNo: timeTableDayInfo.lessonSchedule.classNo,
-				colour: timetable_colour
+				colour: timetable_colour,
+				selectedTimetableId: timetable_id
 			};
 		} else {
 			currentlySelectedMods.set(
@@ -46,7 +45,6 @@
 					acadYear,
 					semester,
 					timetable_id,
-					timetable_name,
 					timeTableDayInfo.moduleCode,
 					timeTableDayInfo.lessonSchedule.lessonType,
 					timeTableDayInfo.lessonSchedule.classNo,
@@ -57,7 +55,8 @@
 				classNo: '',
 				colour: '',
 				lessonType: '',
-				moduleCode: ''
+				moduleCode: '',
+				selectedTimetableId: ''
 			};
 		}
 	}
