@@ -88,8 +88,10 @@ public class TimetableService(AppDbContext context) : ITimetableService
 
     public async Task<List<TimetableSummaryResponse>> GetTimetablesAsync(Guid userId)
     {
+        // TODO: have some sort of friend system
+
         return await _context
-            .Timetables.Where(t => t.UserId == userId) // TODO: have some sort of friend system
+            .Timetables.Where(t => t.UserId == userId && t.Id == t.RoomId) // We only get the "main" timetables
             .Select(t => new TimetableSummaryResponse
             {
                 Id = t.Id,
