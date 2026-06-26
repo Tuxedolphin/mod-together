@@ -3,9 +3,27 @@
 	import SearchBar from '$lib/components/SearchBar.svelte';
 	import Timeline from '$lib/components/Timeline.svelte';
 	import TimetableComponent from '$lib/components/TimetableComponent.svelte';
-	import { currentlySelectedMods, token_information } from '$lib/shared/shared.svelte';
+	import {
+		currentlySelectedMods,
+		currentUserInformation,
+		token_information
+	} from '$lib/shared/shared.svelte';
 	import { getTimetable } from '$lib/utils/format_db_information';
 	import { onDestroy, onMount } from 'svelte';
+	import type { PageProps } from './$types';
+	import type {
+		Profile,
+		RoomInformation,
+		TimetableDetailedResponse,
+		TimetableResponse
+	} from '$lib/types/db_raw_types';
+	import type { Unsubscriber } from 'svelte/store';
+	import { format_AY_name, format_semester_name } from '$lib/utils/formatting_utils';
+	import ModListGroup from '$lib/components/ModListGroup.svelte';
+	import { CircleX } from '@lucide/svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { roomHub } from '$lib/stores/roomHub';
 
 	let is_timetable_loaded = $state(false);
 	let profiles: Profile[] = $state([]);
@@ -26,16 +44,6 @@
 		)
 	);
 
-	import type { PageProps } from './$types';
-	import { get_timetable_by_id, put_timetable_by_id } from '$lib/utils/db_operations';
-	import type { Profile, RoomInformation, TimetableResponse } from '$lib/types/db_raw_types';
-	import type { Unsubscriber } from 'svelte/store';
-	import { format_AY_name, format_semester_name } from '$lib/utils/formatting_utils';
-	import ModListGroup from '$lib/components/ModListGroup.svelte';
-	import { CircleX } from '@lucide/svelte';
-	import { goto } from '$app/navigation';
-	import { resolve } from '$app/paths';
-	import { roomHub } from '$lib/stores/roomHub';
 	let { params }: PageProps = $props();
 	let unsubscribe_from_mods_list: Unsubscriber;
 
@@ -43,63 +51,44 @@
 		// SignalR Related Actions
 		await roomHub.connect($token_information.a);
 
-		const info: RoomInformation = await $roomHub?.invoke('CreateOrJoinRoom', params.timetable_id);
+		const info: RoomInformation | undefined = await $roomHub?.invoke(
+			'CreateOrJoinRoom',
+			params.timetable_id
+		);
 		console.log(info);
 		is_timetable_loaded = false;
 
-		timetable_metadata = info.timetables[0];
-		profiles = info.users;
-		//const timetable_data = await get_timetable_by_id($token_information.a, params.timetable_id);
-
-		$currentlySelectedMods = info.timetables;
-		// if (timetable_data.isOk()) {
-		// 	timetable_metadata = timetable_data.value;
-		// 	$currentlySelectedMods = [timetable_data.value];
-		// }
+		timetable_metadata = info!.timetables[0];
+		profiles = info!.users;
+		$currentlySelectedMods = info!.timetables;
 
 		$roomHub?.on('ReceiveMessage', (msg) => console.log(msg));
-		$roomHub?.on('ReceiveTimetableUpdate', (msg) => console.log(msg));
+		$roomHub?.on('ReceiveTimetableUpdate', (msg: TimetableDetailedResponse[]) => {
+			update_from_room = true;
+			$currentlySelectedMods = msg;
+		});
 		$roomHub?.on('ReceiveUserUpdate', (msg: Profile[]) => {
 			profiles = msg;
 		});
-		// if (timetable_data.isOk()) {
-		// 	timetable_metadata = timetable_data.value;
-		// 	$currentlySelectedMods = [timetable_data.value];
 
-		// 	unsubscribe_from_mods_list = currentlySelectedMods.subscribe(
-		// 		async (updated_timetable) => {
-		// 			for (const timetable of updated_timetable) {
-		// 				if (timetable.id == params.timetable_id) {
-		// 					const response = await put_timetable_by_id(
-		// 						$token_information.a,
-		// 						timetable.id,
-		// 						timetable
-		// 					);
-		// 					if (response.isOk()) {
-		// 						console.log('Update for Timetable ' + timetable.id);
-		// 					}
-		// 				}
-		// 			}
-		// 		},
-		// 		() => {}
-		// 	);
-
-		// 	is_timetable_loaded = true;
-		// }
 		let first_time_subscribe = true;
+		let update_from_room = false;
 		unsubscribe_from_mods_list = currentlySelectedMods.subscribe(async (updated_timetable) => {
 			if (first_time_subscribe) {
 				first_time_subscribe = false;
 				return;
 			}
+
+			if (update_from_room) {
+				update_from_room = false;
+				return;
+			}
 			for (const timetable of updated_timetable) {
 				if (timetable.id === params.timetable_id) {
-					const update_info = await $roomHub?.invoke('UpdateTimetable', params.timetable_id, {
+					await $roomHub?.invoke('UpdateTimetable', params.timetable_id, {
 						Name: timetable.name,
 						MetaData: timetable.metaData
 					});
-
-					console.log('Update: ' + update_info);
 				}
 			}
 		});
@@ -132,8 +121,11 @@
 		</div>
 		<div class="flex">
 			<div>
-				{#each profiles as profile (profile.username)}
-					<p>{profile.username}</p>
+				{#each profiles as profile (profile.userId)}
+					<p>
+						{profile.username}
+						{profile.userId === $currentUserInformation.userId ? '(You)' : ''}
+					</p>
 				{/each}
 			</div>
 			<CircleX
