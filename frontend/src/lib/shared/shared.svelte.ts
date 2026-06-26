@@ -1,9 +1,9 @@
-import type { TimetableResponse, Profile } from '$lib/types/db_raw_types';
+import type { Profile, TimetableDetailedResponse } from '$lib/types/db_raw_types';
 import { persisted } from 'svelte-persisted-store';
 import { writable } from 'svelte/store';
 // First param `preferences` is the local storage key.
 // Second param is the initial value.
-export const currentlySelectedMods = persisted('selectedMods', [] as TimetableResponse[], {
+export const currentlySelectedMods = persisted('selectedMods', [] as TimetableDetailedResponse[], {
 	storage: 'session'
 });
 
@@ -30,6 +30,10 @@ export const currentUserInformation = persisted(
 		storage: 'session'
 	}
 );
+
+export const currentWorkingTimetable = persisted('erixnus', '', {
+	storage: 'session'
+});
 
 export const chooseModState = writable({
 	moduleCode: '',

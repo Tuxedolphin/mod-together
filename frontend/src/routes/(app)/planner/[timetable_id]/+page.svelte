@@ -6,6 +6,7 @@
 	import {
 		currentlySelectedMods,
 		currentUserInformation,
+		currentWorkingTimetable,
 		token_information
 	} from '$lib/shared/shared.svelte';
 	import { getTimetable } from '$lib/utils/format_db_information';
@@ -15,6 +16,7 @@
 		Profile,
 		RoomInformation,
 		TimetableDetailedResponse,
+		TimetablePostTemplate,
 		TimetableResponse
 	} from '$lib/types/db_raw_types';
 	import type { Unsubscriber } from 'svelte/store';
@@ -46,7 +48,7 @@
 
 	let { params }: PageProps = $props();
 	let unsubscribe_from_mods_list: Unsubscriber;
-
+	let user_tt: TimetableDetailedResponse | undefined;
 	onMount(async () => {
 		// SignalR Related Actions
 		await roomHub.connect($token_information.a);
@@ -55,7 +57,6 @@
 			'CreateOrJoinRoom',
 			params.timetable_id
 		);
-		console.log(info);
 		is_timetable_loaded = false;
 
 		timetable_metadata = info!.timetables[0];
@@ -71,6 +72,25 @@
 			profiles = msg;
 		});
 
+		// Find a timetable that belongs to current user:
+		user_tt = info!.timetables.find((x) => x.profile.userId === $currentUserInformation.userId);
+
+		if (!user_tt) {
+			const info_to_post: TimetablePostTemplate = {
+				academicYear: timetable_metadata.academicYear,
+				metaData: [],
+				name: timetable_metadata.name,
+				semester: timetable_metadata.semester
+			};
+			await $roomHub?.invoke('CreateTimetable', info_to_post);
+
+			roomHub.disconnect();
+
+			window.location.reload();
+		}
+
+		$currentWorkingTimetable = user_tt?.id as string;
+
 		let first_time_subscribe = true;
 		let update_from_room = false;
 		unsubscribe_from_mods_list = currentlySelectedMods.subscribe(async (updated_timetable) => {
@@ -83,9 +103,11 @@
 				update_from_room = false;
 				return;
 			}
+
 			for (const timetable of updated_timetable) {
-				if (timetable.id === params.timetable_id) {
-					await $roomHub?.invoke('UpdateTimetable', params.timetable_id, {
+				if (timetable.id === user_tt?.id) {
+					console.log('Update TT for: ' + user_tt.profile.username);
+					await $roomHub?.invoke('UpdateTimetable', timetable.id, {
 						Name: timetable.name,
 						MetaData: timetable.metaData
 					});
@@ -158,7 +180,7 @@
 	</div>
 
 	<SearchBar
-		timetable_id={timetable_metadata.id}
+		timetable_id={user_tt?.id as string}
 		timetable_name={timetable_metadata.name}
 		acadYear={timetable_metadata.academicYear}
 		semester={timetable_metadata.semester}
