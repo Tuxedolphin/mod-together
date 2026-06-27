@@ -4,7 +4,6 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
-	// svelte-ignore non_reactive_update
 	let dialog: HTMLDialogElement;
 </script>
 
