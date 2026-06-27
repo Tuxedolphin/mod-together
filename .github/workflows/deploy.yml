@@ -45,6 +45,16 @@ jobs:
           remote_port: ${{ secrets.REMOTE_PORT }} # ex: 22
           remote_user: ${{ secrets.REMOTE_USER }} # ex: ubuntu
           remote_key: ${{ secrets.REMOTE_PRIVATE_KEY }}
+      - name: Restart Mod-tgt Service
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.REMOTE_PRIVATE_KEY }}
+          port: 22
+          script: |
+            echo ${{secrets.REMOTE_PSWD}} | sudo -S systemctl restart mod-tgt
+
   deploy-frontend:
     runs-on: ubuntu-latest
     needs:

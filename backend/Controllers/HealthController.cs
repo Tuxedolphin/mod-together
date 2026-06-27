@@ -18,7 +18,7 @@ public class HealthController(AppDbContext _context) : BaseController
             var conn = _context.Database.GetDbConnection();
             await conn.OpenAsync();
             await conn.CloseAsync();
-            return Ok(new { status = "Healthy", database = "Connected" });
+            return Ok(new { status = "Healthy!", database = "Connected" });
         }
         catch (Exception ex)
         {
