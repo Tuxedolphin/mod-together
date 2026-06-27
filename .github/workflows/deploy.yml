@@ -27,6 +27,8 @@ jobs:
         run: dotnet restore backend/Backend.csproj && dotnet restore backend.tests/Backend.Tests.csproj
       - name: Build
         run: dotnet build --no-restore backend/Backend.csproj && dotnet build --no-restore backend.tests/Backend.Tests.csproj
+      - name: Publish
+        run: dotnet publish -c Release backend/Backend.csproj
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
