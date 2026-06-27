@@ -7,13 +7,15 @@
 	let dialog: HTMLDialogElement;
 </script>
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="avatar avatar-placeholder" onclick={() => dialog.show()}>
 	<div class="w-12 rounded-full bg-neutral text-neutral-content">
 		<span class="text-3xl">{$currentUserInformation.username?.charAt(0)}</span>
 	</div>
 </div>
 
-<GenericDialog bind:dialog>
+<GenericDialog bind:dialog closeHandler={() => {}}>
 	<h3 class="text-lg font-bold">Hi, {$currentUserInformation.username}</h3>
 
 	<button
