@@ -1,6 +1,10 @@
 <script lang="ts">
-	import { currentlySelectedMods } from '$lib/shared/shared.svelte';
-	import type { TimetableModule, TimetableResponse } from '$lib/types/db_raw_types';
+	import { currentlySelectedMods, currentUserInformation } from '$lib/shared/shared.svelte';
+	import type {
+		TimetableDetailedResponse,
+		TimetableModule,
+		TimetableResponse
+	} from '$lib/types/db_raw_types';
 	import { getFullModInfo } from '$lib/utils/fetch_from_cache';
 	import { modifyModColour, removeModEntry } from '$lib/utils/format_db_information';
 	import { X } from '@lucide/svelte';
@@ -10,7 +14,7 @@
 		lesson_groups: Partial<Record<string, TimetableModule[]>>;
 		acadYear: string;
 		lesson_header: string;
-		timetable: TimetableResponse;
+		timetable: TimetableDetailedResponse;
 	}
 	let { lesson_groups, acadYear, lesson_header, timetable }: ModInfoCardProps = $props();
 	let selectedLessonGroup: TimetableModule[] = $state([]);
@@ -26,6 +30,7 @@
 						<!-- svelte-ignore a11y_consider_explicit_label -->
 						<button
 							onclick={() => {
+								if (timetable.profile.userId !== $currentUserInformation.userId) return;
 								selectedLessonGroup = lesson_groups[lesson_header]!;
 								dialog.showModal();
 							}}
@@ -38,21 +43,22 @@
 							</div>
 						{/await}
 					</div>
-
-					<X
-						size={32}
-						onclick={() => {
-							currentlySelectedMods.set(
-								removeModEntry(
-									$currentlySelectedMods,
-									timetable.academicYear,
-									timetable.semester,
-									timetable.id,
-									lesson_groups[lesson_header]![0].moduleCode
-								)
-							);
-						}}
-					></X>
+					{#if timetable.profile.userId === $currentUserInformation.userId}
+						<X
+							size={32}
+							onclick={() => {
+								currentlySelectedMods.set(
+									removeModEntry(
+										$currentlySelectedMods,
+										timetable.academicYear,
+										timetable.semester,
+										timetable.id,
+										lesson_groups[lesson_header]![0].moduleCode
+									)
+								);
+							}}
+						></X>
+					{/if}
 				</div>
 			</div>
 		</summary>

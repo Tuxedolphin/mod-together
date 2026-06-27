@@ -41,6 +41,7 @@ function create_ky_instance(custom_options: CustomOptions) {
 				async ({ response }) => {
 					if (custom_options.unauthorizedCheck && response.status === 401) {
 						token_information.reset();
+						currentUserInformation.reset();
 						const message = 'Login expired, please login in again';
 						goto(resolve(`/login#error_description=${message}`));
 					}

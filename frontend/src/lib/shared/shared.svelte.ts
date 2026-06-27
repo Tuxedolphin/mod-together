@@ -20,16 +20,10 @@ export const token_information = persisted('xhnus', {
 	b: false
 } as AccessTokenInfo);
 
-export const currentUserInformation = persisted(
-	'clrsnus',
-	{
-		userId: '',
-		username: ''
-	} as Profile,
-	{
-		storage: 'session'
-	}
-);
+export const currentUserInformation = persisted('clrsnus', {
+	userId: '',
+	username: ''
+} as Profile);
 
 export const currentWorkingTimetable = persisted('erixnus', '', {
 	storage: 'session'

@@ -106,7 +106,6 @@
 
 			for (const timetable of updated_timetable) {
 				if (timetable.id === user_tt?.id) {
-					console.log('Update TT for: ' + user_tt.profile.username);
 					await $roomHub?.invoke('UpdateTimetable', timetable.id, {
 						Name: timetable.name,
 						MetaData: timetable.metaData
