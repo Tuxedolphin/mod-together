@@ -3,6 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import { currentUserInformation, token_information } from '$lib/shared/shared.svelte';
 import { resolve } from '$app/paths';
 import { goto } from '$app/navigation';
+import { PUBLIC_DB_LINK } from '$env/static/public';
 
 const createRoomHub = function () {
 	const { subscribe, set } = writable<signalR.HubConnection | null>(null);
@@ -11,7 +12,7 @@ const createRoomHub = function () {
 
 	const connect = async function (token: string) {
 		connection = new signalR.HubConnectionBuilder()
-			.withUrl('http://localhost:5233/hubs/room', {
+			.withUrl(`${PUBLIC_DB_LINK}/hubs/room`, {
 				accessTokenFactory: () => token
 			})
 			.configureLogging(signalR.LogLevel.Error)
