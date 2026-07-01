@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.DTOs;
+using Backend.DTOs.Mappings;
 using Backend.Exceptions;
 using Backend.Models;
 using Backend.Services.Rooms;
@@ -287,19 +288,7 @@ public class TimetableServiceTests : IAsyncLifetime
         var userId = await SeedProfileAsync();
         var mainTimetable = await SeedTimetableAsync(userId);
 
-        var nonMainId = Guid.NewGuid();
-        _context.Timetables.Add(
-            new Timetable
-            {
-                Id = nonMainId,
-                Name = "Non-main",
-                RoomId = mainTimetable.RoomId,
-                UserId = userId,
-                Semester = 1,
-                AcademicYear = "2024-2025",
-                MetaData = [],
-            }
-        );
+        _context.Timetables.Add(CreateTimetable(roomId: mainTimetable.RoomId, userId: userId, name: "Non-main"));
         await _context.SaveChangesAsync();
 
         _context.ChangeTracker.Clear();
@@ -362,24 +351,15 @@ public class TimetableServiceTests : IAsyncLifetime
         var userId = await SeedProfileAsync();
         var mainTimetable = await SeedTimetableAsync(userId);
 
-        var newId = Guid.NewGuid();
-        var roomTimetable = new RoomTimetable
-        {
-            Id = newId,
-            UserId = userId,
-            Name = "Upserted",
-            Semester = 2,
-            AcademicYear = "2024-2025",
-            MetaData = CreateMetaData(),
-            RoomId = mainTimetable.RoomId,
-        };
+        var newTimetable = CreateTimetable(roomId: mainTimetable.RoomId, userId: userId, name: "Upserted");
+        var roomTimetable = newTimetable.ToRoomTimetable();
 
         await _service.UpsertTimetableAsync(roomTimetable);
         await _context.SaveChangesAsync();
 
         _context.ChangeTracker.Clear();
 
-        var saved = await _context.Timetables.FindAsync(newId);
+        var saved = await _context.Timetables.FindAsync(newTimetable.Id);
         saved.ShouldNotBeNull();
         saved.Name.ShouldBe("Upserted");
     }
@@ -392,16 +372,11 @@ public class TimetableServiceTests : IAsyncLifetime
 
         var updatedMetaData = CreateMetaData(1, "CS3230", "LEC", "#0000FF");
 
-        var roomTimetable = new RoomTimetable
-        {
-            Id = timetable.Id,
-            UserId = userId,
-            Name = "Updated via Upsert",
-            Semester = 2,
-            AcademicYear = "2025-2026",
-            MetaData = updatedMetaData,
-            RoomId = timetable.RoomId,
-        };
+        var roomTimetable = timetable.ToRoomTimetable();
+        roomTimetable.Name = "Updated via Upsert";
+        roomTimetable.Semester = 2;
+        roomTimetable.AcademicYear = "2025-2026";
+        roomTimetable.MetaData = updatedMetaData;
 
         await _service.UpsertTimetableAsync(roomTimetable);
         await _context.SaveChangesAsync();
@@ -422,17 +397,7 @@ public class TimetableServiceTests : IAsyncLifetime
     {
         var userId = await SeedProfileAsync();
         var mainTimetable = await SeedTimetableAsync(userId);
-
-        var roomTimetable = new RoomTimetable
-        {
-            Id = Guid.NewGuid(),
-            UserId = userId,
-            Name = "Test",
-            Semester = 1,
-            AcademicYear = "2024-2025",
-            MetaData = [],
-            RoomId = mainTimetable.RoomId,
-        };
+        var roomTimetable = CreateTimetable(roomId: mainTimetable.RoomId, userId: userId).ToRoomTimetable();
 
         var result = await _service.UpsertTimetableAsync(roomTimetable);
 
@@ -490,6 +455,27 @@ public class TimetableServiceTests : IAsyncLifetime
             AcademicYear = "2024-2025",
             MetaData = metaData ?? CreateMetaData(),
         };
+
+    private static Timetable CreateTimetable(
+        Guid? roomId = null,
+        Guid? userId = null,
+        List<TimetableModule>? metaData = null,
+        string name = "Test"
+    )
+    {
+        var id = Guid.NewGuid();
+        return new Timetable
+        {
+            Id = id,
+            Name = name,
+            RoomId = roomId ?? id,
+            UserId = userId ?? Guid.NewGuid(),
+            Semester = 1,
+            AcademicYear = "2024-2025",
+            CreatedAt = DateTime.UtcNow,
+            MetaData = metaData ?? [],
+        };
+    }
 
     private static List<TimetableModule> CreateMetaData(
         int count = 1,
