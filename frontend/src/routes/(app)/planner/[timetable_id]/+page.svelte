@@ -75,7 +75,6 @@
 			// If a new timetable is created: update local userid:
 			if (!user_tt) {
 				user_tt = msg.find((x) => x.profile.userId === $currentUserInformation.userId);
-				$currentWorkingTimetable.timetable_id = user_tt?.id as string;
 				// Force update:
 				update_from_room = false;
 			}
@@ -98,8 +97,6 @@
 			};
 			await $roomHub?.invoke('CreateTimetable', info_to_post);
 		}
-
-		$currentWorkingTimetable.timetable_id = user_tt?.id as string;
 
 		unsubscribe_from_mods_list = currentlySelectedMods.subscribe(async (updated_timetable) => {
 			if (first_time_subscribe) {
