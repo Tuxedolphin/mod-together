@@ -5,9 +5,6 @@ using Shouldly;
 
 namespace Backend.Tests.Services;
 
-// The response DTOs are records holding List<TimetableModule>, so their generated equality
-// compares the list by reference. These helpers compare field-by-field, with MetaData
-// compared element-wise, so value-identical objects assert as equal.
 public static class AssertExtensions
 {
     public static void ShouldMatch(
