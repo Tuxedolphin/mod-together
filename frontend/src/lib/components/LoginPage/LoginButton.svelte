@@ -14,6 +14,7 @@
 		errorMessage: string;
 	}
 	let loading = $state(false);
+	// eslint-disable-next-line no-useless-assignment
 	let { errorMessage = $bindable<string>(), email, password }: LoginButtonProps = $props();
 
 	async function login() {
