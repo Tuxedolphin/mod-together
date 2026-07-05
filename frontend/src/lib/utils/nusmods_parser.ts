@@ -37,7 +37,14 @@ const ABBREV_TO_LESSON_TYPE: lessonTypeAbbrev = {
 	WS: 'Workshop'
 };
 
-export function parse_mods_link(link: string): Result<string, string> {
+export function parse_mods_link(link: string): Result<
+	{
+		semester_no: number;
+		no_mods_detected: number;
+		mods_info: TimetableModule[];
+	},
+	string
+> {
 	let sem_number = 0;
 
 	const url = URL.parse(link);
@@ -77,8 +84,13 @@ export function parse_mods_link(link: string): Result<string, string> {
 		}
 	}
 
-	console.log(timetable_modules);
-	return Ok('');
+	const detected_mods = Object.groupBy(timetable_modules, (x) => x.moduleCode);
+
+	return Ok({
+		mods_info: timetable_modules,
+		no_mods_detected: Object.keys(detected_mods).length,
+		semester_no: sem_number
+	});
 }
 
 // Takes a sem-string (i.e., sem-1, sem-2, st-i) and returns the
