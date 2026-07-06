@@ -1,13 +1,13 @@
 <script lang="ts">
-	import CreateNewTimetableButton from '../../../lib/components/CreateNewTimetableButton.svelte';
 
 	import { onMount } from 'svelte';
-	import GreetingComponent from '$lib/components/GreetingComponent.svelte';
-	import { token_information } from '$lib/shared/shared.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import AvailableTimetableGrid from '$lib/components/AvailableTimetableGrid.svelte';
+	import GreetingComponent from '$lib/components/GreetingComponent.svelte';
 	import ImportFromNUSMods from '$lib/components/ImportFromNUSMods.svelte';
+	import { token_information } from '$lib/shared/shared.svelte';
+	import CreateNewTimetableButton from '../../../lib/components/CreateNewTimetableButton.svelte';
 
 	let token = $state('');
 	onMount(() => {

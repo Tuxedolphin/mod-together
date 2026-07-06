@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { Import, LucideMousePointerSquareDashed } from '@lucide/svelte';
-	import GenericDialog from '../../routes/(app)/GenericDialog.svelte';
-	import { parse_mods_link } from '$lib/utils/nusmods_parser';
-	import { format_AY_name, format_semester_name } from '$lib/utils/formatting_utils';
-	import { create_empty_timetable, put_timetable_by_id } from '$lib/utils/db_operations';
-	import { token_information } from '$lib/shared/shared.svelte';
-	import { createModEntry, modifyModEntry } from '$lib/utils/format_db_information';
-	import { resolve } from '$app/paths';
+	import { Import } from '@lucide/svelte';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { token_information } from '$lib/shared/shared.svelte';
+	import { create_empty_timetable, put_timetable_by_id } from '$lib/utils/db_operations';
+	import { format_AY_name, format_semester_name } from '$lib/utils/formatting_utils';
+	import { parse_mods_link } from '$lib/utils/nusmods_parser';
+	import GenericDialog from '../../routes/(app)/GenericDialog.svelte';
 
 	// svelte-ignore non_reactive_update
-	let dialog: HTMLDialogElement;
+	// biome-ignore lint/suspicious/noUnassignedVariables: Detection for dialog use is unstable
+		let dialog: HTMLDialogElement;
 	let timetable_name = $state('');
 	let error = $state('');
 	let sucess_text = $state('');
@@ -27,7 +27,7 @@
 		}
 
 		if (second_click && parsed_result.isOk()) {
-			const { mods_info, no_mods_detected, semester_no } = parsed_result.value;
+			const { mods_info, semester_no } = parsed_result.value;
 			const timetable_info = await create_empty_timetable(
 				$token_information.a,
 				timetable_name,

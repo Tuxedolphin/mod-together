@@ -1,9 +1,10 @@
 <script lang="ts">
-	import type { TimetableDetailedResponse } from '$lib/types/db_raw_types';
 	import { onDestroy, onMount } from 'svelte';
-	import ModListModInfo from './ModListModInfo.svelte';
-	import { currentlySelectedMods, currentUserInformation } from '$lib/shared/shared.svelte';
 	import type { Unsubscriber } from 'svelte/store';
+	import { currentlySelectedMods, currentUserInformation } from '$lib/shared/shared.svelte';
+	import type { TimetableDetailedResponse } from '$lib/types/db_raw_types';
+	import ModListModInfo from './ModListModInfo.svelte';
+
 	let current_selected_mods_unsubsriber: Unsubscriber;
 
 	interface ModListGroupProps {
