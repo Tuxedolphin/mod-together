@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/correctness/noUndeclaredVariables: auto generated file */
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import type { Unsubscriber } from 'svelte/store';
