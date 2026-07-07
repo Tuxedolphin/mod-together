@@ -43,7 +43,15 @@ public class AuthController(IAuthService authService) : BaseController
     [Authorize]
     public async Task<IActionResult> Logout()
     {
-        await _authService.LogoutAsync();
+        await _authService.LogoutAsync(GetBearerToken());
+        return NoContent();
+    }
+
+    [HttpPost("logout-all")]
+    [Authorize]
+    public async Task<IActionResult> LogoutAll()
+    {
+        await _authService.LogoutAllAccountsAsync(GetBearerToken());
         return NoContent();
     }
 
@@ -61,31 +69,30 @@ public class AuthController(IAuthService authService) : BaseController
             Console.WriteLine($"ForgotPassword external service exception: ${ex.Message}");
         }
 
-        return Ok();
+        return NoContent();
     }
 
     [HttpPost("reset-password")]
-    public async Task<IActionResult> ResetPassowrd([FromBody] ResetPasswordRequest request)
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
         await _authService.ResetPasswordAsync(request);
-        return Ok();
+        return NoContent();
     }
 
     [HttpPost("update-password")]
     [Authorize]
     public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordRequest request)
     {
-        string token = GetBearerToken(HttpContext) ?? throw new UnauthorizedAccessException();
-
-        await _authService.UpdatePasswordAsync(request, token);
-        return Ok();
+        await _authService.UpdatePasswordAsync(request, GetBearerToken());
+        return NoContent();
     }
 
-    private static string? GetBearerToken(HttpContext ctx)
+    private string GetBearerToken()
     {
-        var header = ctx.Request.Headers.Authorization.ToString();
+        var header = HttpContext.Request.Headers.Authorization.ToString();
+
         return header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
             ? header["Bearer ".Length..].Trim()
-            : null;
+            : throw new UnauthorizedAccessException("Bearer token not found in request.");
     }
 }
