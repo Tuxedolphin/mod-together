@@ -12,14 +12,19 @@ http:
     type: json
     data: |-
       {
-        "refreshToken": "vui5zpm5clly"
+        "refreshToken": "{{refreshToken}}"
       }
-  auth: inherit
 
 runtime:
   variables:
     - name: baseUrl
       value: http://localhost:5233
+  scripts:
+    - type: after-response
+      code: |-
+        const data = res.getBody();
+        bru.setEnvVar("accessToken", data.accessToken, { persist: false });
+        bru.setEnvVar("refreshToken", data.refreshToken, { persist: false });
 
 settings:
   encodeUrl: true
