@@ -87,7 +87,7 @@ public class AuthService(Client supabase, IOptions<SupabaseSettings> settings) :
 
     public async Task ForgotPasswordAsync(ForgotPasswordRequest request)
     {
-        const string redirectUrl = "https://mods-tgt.com/reset-password";
+        const string redirectUrl = "https://mods-tgt.com";
 
         using var http = new HttpClient();
         http.DefaultRequestHeaders.Add("apikey", _supabaseKey);
