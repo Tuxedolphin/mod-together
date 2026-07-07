@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using Backend.DTOs;
 using Backend.Exceptions;
 using Backend.Settings;
@@ -82,6 +83,92 @@ public class AuthService(Client supabase, IOptions<SupabaseSettings> settings) :
             Message = "Registration successful.",
             Session = ExtractTokens(session),
         };
+    }
+
+    public async Task ForgotPasswordAsync(ForgotPasswordRequest request)
+    {
+        const string redirectUrl = "https://mods-tgt.com";
+
+        using var http = new HttpClient();
+        http.DefaultRequestHeaders.Add("apikey", _supabaseKey);
+
+        var url = $"{_supabaseUrl}/auth/v1/recover?redirect_to={Uri.EscapeDataString(redirectUrl)}";
+        var response = await http.PostAsJsonAsync(url, new { email = request.Email });
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+
+            throw new ExternalServiceException(
+                $"Recovery email failed, with status {(int)response.StatusCode} {response.StatusCode}. Details: {error} "
+            );
+        }
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordRequest request)
+    {
+        using var verifyHttp = new HttpClient();
+        verifyHttp.DefaultRequestHeaders.Add("apikey", _supabaseKey);
+
+        var verifyResponse = await verifyHttp.PostAsJsonAsync(
+            $"{_supabaseUrl}/auth/v1/verify",
+            new { type = "recovery", token_hash = request.TokenHash }
+        );
+
+        if (!verifyResponse.IsSuccessStatusCode)
+        {
+            string error = await verifyResponse.Content.ReadAsStringAsync();
+            throw new ExternalServiceException(
+                $"Recovery token invalid or expired. Status: {(int)verifyResponse.StatusCode}. Details: {error}"
+            );
+        }
+
+        SupabaseTokenResponse session =
+            await verifyResponse.Content.ReadFromJsonAsync<SupabaseTokenResponse>()
+            ?? throw new ExternalServiceException("Verify returned no session");
+
+        using var updateHttp = new HttpClient();
+        updateHttp.DefaultRequestHeaders.Add("apikey", _supabaseKey);
+        updateHttp.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            session.AccessToken
+        );
+
+        var updateResponse = await updateHttp.PutAsJsonAsync(
+            $"{_supabaseUrl}/auth/v1/user",
+            new { password = request.Password }
+        );
+
+        if (!updateResponse.IsSuccessStatusCode)
+        {
+            string error = await updateResponse.Content.ReadAsStringAsync();
+            throw new ExternalServiceException(
+                $"Password update failed. Status: {(int)updateResponse.StatusCode}. Details: {error}"
+            );
+        }
+
+        // Logs user out of all sessions, according to best practice
+
+        using var logoutHttp = new HttpClient();
+        logoutHttp.DefaultRequestHeaders.Add("apikey", _supabaseKey);
+        logoutHttp.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Bearer",
+            session.AccessToken
+        );
+
+        var logoutResponse = await logoutHttp.PostAsync(
+            $"{_supabaseUrl}/auth/v1/logout?scope=global",
+            content: null
+        );
+
+        // Logging this only since password has already changed
+        if (!logoutResponse.IsSuccessStatusCode)
+        {
+            string error = await verifyResponse.Content.ReadAsStringAsync();
+
+            // TODO: Add proper logging for this
+            Console.WriteLine($"Logout error: {error}");
+        }
     }
 
     private static AuthResponse ExtractTokens(Supabase.Gotrue.Session? response)
