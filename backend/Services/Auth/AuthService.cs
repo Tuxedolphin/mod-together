@@ -1,17 +1,14 @@
 using System.Net.Http.Headers;
 using Backend.DTOs;
 using Backend.Exceptions;
-using Backend.Settings;
-using Microsoft.Extensions.Options;
 using Supabase;
 
 namespace Backend.Services.Auth;
 
-public class AuthService(Client supabase, IOptions<SupabaseSettings> settings) : IAuthService
+public class AuthService(Client supabase, IHttpClientFactory httpClientFactory) : IAuthService
 {
     private readonly Client _supabase = supabase;
-    private readonly string _supabaseUrl = settings.Value.Url;
-    private readonly string _supabaseKey = settings.Value.PublishableKey;
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
@@ -19,9 +16,30 @@ public class AuthService(Client supabase, IOptions<SupabaseSettings> settings) :
         return ExtractTokens(response);
     }
 
-    public async Task LogoutAsync()
+    public async Task LogoutAsync(string accessToken)
     {
-        await _supabase.Auth.SignOut();
+        var response = await PostGotrueAsync("logout?scope=local", null, accessToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new ExternalServiceException(
+                $"Logout failed. Status: {(int)response.StatusCode} {response.StatusCode}. Details: {errorContent}"
+            );
+        }
+    }
+
+    public async Task LogoutAllAccountsAsync(string accessToken)
+    {
+        var response = await PostGotrueAsync("logout?scope=global", null, accessToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new ExternalServiceException(
+                $"Logout from all devices failed. Status: {(int)response.StatusCode} {response.StatusCode}. Details: {errorContent}"
+            );
+        }
     }
 
     public async Task<AuthResponse> RefreshTokenAsync(RefreshTokenRequest request)
@@ -29,14 +47,9 @@ public class AuthService(Client supabase, IOptions<SupabaseSettings> settings) :
         // We make a bit of cheat here, supabase client prefers if we just refresh directly from the frontend client,
         // so we mimic how we'll do it from the frontend
 
-        using var http = new HttpClient();
-
-        http.DefaultRequestHeaders.Add("apikey", _supabaseKey);
-
-        var body = new { refresh_token = request.RefreshToken };
-        var response = await http.PostAsJsonAsync(
-            $"{_supabaseUrl}/auth/v1/token?grant_type=refresh_token",
-            body
+        var response = await PostGotrueAsync(
+            "token?grant_type=refresh_token",
+            new { refresh_token = request.RefreshToken }
         );
 
         if (!response.IsSuccessStatusCode)
@@ -65,8 +78,6 @@ public class AuthService(Client supabase, IOptions<SupabaseSettings> settings) :
     {
         var session = await _supabase.Auth.SignUp(request.Email, request.Password);
 
-        // This should happen since email confirmation is on (i.e. session is null
-        // and user has to confirm their email)
         if (session?.AccessToken == null)
         {
             return new RegisterResponse
@@ -89,11 +100,10 @@ public class AuthService(Client supabase, IOptions<SupabaseSettings> settings) :
     {
         const string redirectUrl = "https://mods-tgt.com";
 
-        using var http = new HttpClient();
-        http.DefaultRequestHeaders.Add("apikey", _supabaseKey);
-
-        var url = $"{_supabaseUrl}/auth/v1/recover?redirect_to={Uri.EscapeDataString(redirectUrl)}";
-        var response = await http.PostAsJsonAsync(url, new { email = request.Email });
+        var response = await PostGotrueAsync(
+            $"recover?redirect_to={Uri.EscapeDataString(redirectUrl)}",
+            new { email = request.Email }
+        );
 
         if (!response.IsSuccessStatusCode)
         {
@@ -107,11 +117,8 @@ public class AuthService(Client supabase, IOptions<SupabaseSettings> settings) :
 
     public async Task ResetPasswordAsync(ResetPasswordRequest request)
     {
-        using var verifyHttp = new HttpClient();
-        verifyHttp.DefaultRequestHeaders.Add("apikey", _supabaseKey);
-
-        var verifyResponse = await verifyHttp.PostAsJsonAsync(
-            $"{_supabaseUrl}/auth/v1/verify",
+        var verifyResponse = await PostGotrueAsync(
+            "verify",
             new { type = "recovery", token_hash = request.TokenHash }
         );
 
@@ -127,16 +134,10 @@ public class AuthService(Client supabase, IOptions<SupabaseSettings> settings) :
             await verifyResponse.Content.ReadFromJsonAsync<SupabaseTokenResponse>()
             ?? throw new ExternalServiceException("Verify returned no session");
 
-        using var updateHttp = new HttpClient();
-        updateHttp.DefaultRequestHeaders.Add("apikey", _supabaseKey);
-        updateHttp.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-            "Bearer",
+        var updateResponse = await PutGotrueAsync(
+            "user",
+            new { password = request.Password },
             session.AccessToken
-        );
-
-        var updateResponse = await updateHttp.PutAsJsonAsync(
-            $"{_supabaseUrl}/auth/v1/user",
-            new { password = request.Password }
         );
 
         if (!updateResponse.IsSuccessStatusCode)
@@ -148,27 +149,72 @@ public class AuthService(Client supabase, IOptions<SupabaseSettings> settings) :
         }
 
         // Logs user out of all sessions, according to best practice
-
-        using var logoutHttp = new HttpClient();
-        logoutHttp.DefaultRequestHeaders.Add("apikey", _supabaseKey);
-        logoutHttp.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-            "Bearer",
+        var logoutResponse = await PostGotrueAsync(
+            "logout?scope=global",
+            null,
             session.AccessToken
-        );
-
-        var logoutResponse = await logoutHttp.PostAsync(
-            $"{_supabaseUrl}/auth/v1/logout?scope=global",
-            content: null
         );
 
         // Logging this only since password has already changed
         if (!logoutResponse.IsSuccessStatusCode)
         {
-            string error = await verifyResponse.Content.ReadAsStringAsync();
+            string error = await logoutResponse.Content.ReadAsStringAsync();
 
             // TODO: Add proper logging for this
             Console.WriteLine($"Logout error: {error}");
         }
+    }
+
+    public async Task UpdatePasswordAsync(UpdatePasswordRequest request, string accessToken)
+    {
+        var response = await PutGotrueAsync(
+            "user",
+            new { password = request.NewPassword, current_password = request.OldPassword },
+            accessToken
+        );
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new ExternalServiceException(
+                $"Failed to update password. Status: {(int)response.StatusCode} {response.StatusCode} Error: {error} "
+            );
+        }
+    }
+
+    private HttpClient CreateGotrueClient(string? accessToken)
+    {
+        var http = _httpClientFactory.CreateClient("Gotrue");
+
+        if (accessToken != null)
+        {
+            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer",
+                accessToken
+            );
+        }
+
+        return http;
+    }
+
+    private Task<HttpResponseMessage> PostGotrueAsync(
+        string path,
+        object? body,
+        string? accessToken = null
+    )
+    {
+        var http = CreateGotrueClient(accessToken);
+        return body == null ? http.PostAsync(path, null) : http.PostAsJsonAsync(path, body);
+    }
+
+    private Task<HttpResponseMessage> PutGotrueAsync(
+        string path,
+        object body,
+        string? accessToken = null
+    )
+    {
+        var http = CreateGotrueClient(accessToken);
+        return http.PutAsJsonAsync(path, body);
     }
 
     private static AuthResponse ExtractTokens(Supabase.Gotrue.Session? response)
