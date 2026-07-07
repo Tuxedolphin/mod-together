@@ -75,7 +75,7 @@
             // console.log(current_timetable_id)
             await $roomHub
               ?.invoke(
-                "CreateCopyOfTimetable",
+                "CopyTimetableTo",
                 selected_tt_id,
                 current_timetable_id,
               )

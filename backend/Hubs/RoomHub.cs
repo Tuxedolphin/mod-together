@@ -128,7 +128,7 @@ public class RoomHub(
         await SendUpdatedTimetableToGroupAsync(roomId);
     }
 
-    public async Task CreateCopyOfTimetable(Guid timetableId, Guid timetableIdToCopyTo)
+    public async Task CopyTimetableTo(Guid timetableId, Guid timetableIdToCopyTo)
     {
         try
         {
