@@ -15,6 +15,7 @@ public class LoginRequest
     public string Email { get; set; } = string.Empty;
 
     [Required]
+    [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
     public string Password { get; set; } = string.Empty;
 }
 
@@ -30,17 +31,11 @@ public class RegisterRequest
 
 public class AuthResponse
 {
-    [Required]
-    public string AccessToken { get; set; } = string.Empty;
+    public required string AccessToken { get; set; }
 
-    [Required]
-    public string RefreshToken { get; set; } = string.Empty;
-
-    [Required]
-    public long ExpiresIn { get; set; }
-
-    [Required]
-    public string TokenType { get; set; } = string.Empty;
+    public required string RefreshToken { get; set; }
+    public required long ExpiresIn { get; set; }
+    public required string TokenType { get; set; }
 }
 
 public class SupabaseTokenResponse
@@ -68,4 +63,21 @@ public class RegisterResponse
 public class MeResponse
 {
     public string? Username { get; set; }
+}
+
+public record ForgotPasswordRequest
+{
+    [Required]
+    [EmailAddress]
+    public required string Email { get; init; }
+}
+
+public record ResetPasswordRequest
+{
+    [Required]
+    public required string TokenHash { get; init; }
+
+    [Required]
+    [MinLength(6, ErrorMessage = "Password must be at least 6 characters.")]
+    public required string Password { get; init; }
 }
