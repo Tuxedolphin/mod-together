@@ -17,7 +17,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         _logger.LogError(exception, "Unhandled exception occurred: {Message}", exception.Message);
         var (statusCode, message) = exception switch
         {
-            ValidationException ex => (400, ex.Message),
+            BadRequestException ex => (400, ex.Message),
             GotrueException ex => (ex.StatusCode, ex.Message),
             UnauthorizedAccessException ex => (401, ex.Message),
             NotFoundException ex => (404, ex.Message),
