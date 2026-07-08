@@ -4,6 +4,7 @@ using Backend.Hubs;
 using Backend.Services.Auth;
 using Backend.Services.Profiles;
 using Backend.Services.Rooms;
+using Backend.Services.Storage;
 using Backend.Services.Timetables;
 using Backend.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,15 +44,29 @@ await supabase.InitializeAsync();
 
 builder.Services.AddSingleton(supabase);
 
-builder
-    .Services.AddHttpClient(
-        "Gotrue",
-        client =>
-        {
-            client.BaseAddress = new Uri($"{supabaseSettings.Url}/auth/v1/");
-            client.DefaultRequestHeaders.Add("apikey", supabaseSettings.PublishableKey);
-        }
-    );
+// Needed to prevent name collision, this uses the secretKey while the other uses
+// PublishableKey
+var storageSupabase = new Supabase.Client(
+    supabaseSettings.Url,
+    supabaseSettings.SecretKey,
+    new Supabase.SupabaseOptions { AutoConnectRealtime = false }
+);
+await storageSupabase.InitializeAsync();
+
+// Needed for avatar uploads, uses admin key
+builder.Services.AddSingleton(new SupabaseStorageClient(storageSupabase));
+
+// Needed for deleting users, uses admin key
+builder.Services.AddSingleton(storageSupabase.AdminAuth(supabaseSettings.SecretKey));
+
+builder.Services.AddHttpClient(
+    "Gotrue",
+    client =>
+    {
+        client.BaseAddress = new Uri($"{supabaseSettings.Url}/auth/v1/");
+        client.DefaultRequestHeaders.Add("apikey", supabaseSettings.PublishableKey);
+    }
+);
 
 // Supabase JWT Configuration
 builder

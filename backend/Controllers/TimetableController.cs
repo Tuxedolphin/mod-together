@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
-[Route("[controller]")]
 [ApiController]
+[Route("[controller]")]
 [Authorize]
 public class TimetableController(ITimetableService service) : BaseController
 {
