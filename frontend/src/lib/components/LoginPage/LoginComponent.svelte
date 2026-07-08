@@ -28,11 +28,6 @@
 		}
 
 		registered.set(false);
-
-		// if ($token_information.a !== '' || $token_information.b) {
-		// 	console.log($token_information);
-		// 	goto(resolve('/home'));
-		// }
 	});
 </script>
 
