@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS public."Profiles" (
     "Id" uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    "Username" text
+    "Username" text,
+    "AvatarUpdatedAt" timestamp with time zone
 );
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()

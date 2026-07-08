@@ -48,7 +48,8 @@ public class DatabaseFixture : IAsyncLifetime
         cmd.CommandText = """
             CREATE TABLE IF NOT EXISTS public."Profiles" (
                 "Id" uuid PRIMARY KEY,
-                "Username" text
+                "Username" text,
+                "AvatarUpdatedAt" timestamp with time zone
             );
             """;
         await cmd.ExecuteNonQueryAsync();
