@@ -369,7 +369,7 @@ public class RoomServiceTests : IAsyncLifetime
         var res = await _service.GetProfilesInRoomAsync(roomId);
 
         res.ShouldNotBeNull();
-        res.ShouldBe([new ProfileResponse(userId, "Cached")]);
+        res.ShouldBe([new ProfileResponse(userId, "Cached", null)]);
     }
 
     [Fact]

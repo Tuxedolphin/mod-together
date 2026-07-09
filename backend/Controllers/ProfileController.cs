@@ -1,26 +1,55 @@
-using Backend.Models;
+using Backend.DTOs;
 using Backend.Services.Profiles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class ProfileController(IProfileService profileService) : BaseController
 {
     private readonly IProfileService _profileService = profileService;
 
     [HttpGet("me")]
-    public async Task<IActionResult> GetCurrentUser()
+    public async Task<ActionResult<ProfileResponse>> GetUser()
     {
-        var profile = await _profileService.GetCurrentUserProfileAsync(GetUserId());
+        var profile = await _profileService.GetUserProfileAsync(GetUserId());
         return Ok(profile);
     }
 
     [HttpPut("me")]
-    public async Task<IActionResult> UpdateCurrentUser([FromBody] Profile request)
+    public async Task<IActionResult> UpdateUser([FromBody] UpdateProfileRequest request)
     {
-        await _profileService.UpdateCurrentUserProfileAsync(GetUserId(), request);
+        await _profileService.UpdateUserProfileAsync(GetUserId(), request);
+        return NoContent();
+    }
+
+    [HttpDelete("me")]
+    public async Task<IActionResult> DeleteUser()
+    {
+        await _profileService.DeleteUserProfileAsync(GetUserId());
+
+        return NoContent();
+    }
+
+    [HttpPut("avatar")]
+    public async Task<ActionResult<ProfileResponse>> UpsertUserAvatar([FromForm] IFormFile file)
+    {
+        ProfileResponse response = await _profileService.UpsertUserAvatarAsync(
+            GetUserId(),
+            file.OpenReadStream()
+        );
+
+        return Ok(response);
+    }
+
+    [HttpDelete("avatar")]
+    public async Task<IActionResult> DeleteUserAvatar()
+    {
+        await _profileService.DeleteUserAvatarAsync(GetUserId());
+
         return NoContent();
     }
 }

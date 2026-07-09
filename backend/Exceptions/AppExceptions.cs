@@ -1,13 +1,13 @@
 namespace Backend.Exceptions;
 
-public class ValidationException : Exception
+public class BadRequestException : Exception
 {
-    public ValidationException() { }
+    public BadRequestException() { }
 
-    public ValidationException(string message)
+    public BadRequestException(string message)
         : base(message) { }
 
-    public ValidationException(string message, Exception inner)
+    public BadRequestException(string message, Exception inner)
         : base(message, inner) { }
 }
 
