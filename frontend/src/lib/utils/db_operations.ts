@@ -16,6 +16,7 @@ import type {
 	TimetableResponse,
 	TimetableSummaryResponse
 } from '../types/db_raw_types'
+import { json_tryparse } from './frontend_utils'
 
 const apiCalls = ky.create({
 	baseUrl: PUBLIC_DB_LINK
@@ -52,13 +53,16 @@ function create_ky_instance(custom_options: CustomOptions) {
 }
 
 export async function register_db(
-	username: string,
+	email: string,
 	password: string
 ): Promise<Result<AuthSucessResponse, string>> {
 	try {
-		const register = create_ky_instance({ authorised: false, unauthorizedCheck: false }).extend({
+		const register = create_ky_instance({
+			authorised: false,
+			unauthorizedCheck: false
+		}).extend({
 			json: {
-				email: username,
+				email: email,
 				password: password
 			}
 		})
@@ -69,14 +73,19 @@ export async function register_db(
 		try {
 			if (error instanceof HTTPError) {
 				const errorResponse = error.data as ErrorResponse
-				const errorMessage = JSON.parse(errorResponse.title) as ErrorInformation
-				return new Err(errorMessage.msg)
+				const errorMessage = json_tryparse<ErrorInformation>(errorResponse.title)
+
+				if (errorMessage.isOk()) {
+					return Err(errorMessage.value.msg)
+				}
+
+				return Err(errorMessage.error)
 			}
 		} catch {
-			return new Err('Error Registering. Please try again')
+			return Err('Error Registering. Please try again')
 		}
 
-		return new Err('Error Registering. Please try again.')
+		return Err('Error Registering. Please try again.')
 	}
 }
 
@@ -85,7 +94,10 @@ export async function login_to_db(
 	password: string
 ): Promise<Result<AuthResponse, string>> {
 	try {
-		const login_db = create_ky_instance({ authorised: false, unauthorizedCheck: false }).extend({
+		const login_db = create_ky_instance({
+			authorised: false,
+			unauthorizedCheck: false
+		}).extend({
 			json: {
 				email: username,
 				password: password
@@ -97,8 +109,13 @@ export async function login_to_db(
 		try {
 			if (error instanceof HTTPError) {
 				const errorResponse = error.data as ErrorResponse
-				const errorMessage = JSON.parse(errorResponse.title) as ErrorInformation
-				return new Err(errorMessage.msg)
+				const errorMessage = json_tryparse<ErrorInformation>(errorResponse.title)
+
+				if (errorMessage.isOk()) {
+					return Err(errorMessage.value.msg)
+				}
+
+				return Err(errorMessage.error)
 			}
 		} catch {
 			return new Err('Wrong username or password')
@@ -128,8 +145,13 @@ export async function put_user_info(
 		try {
 			if (error instanceof HTTPError) {
 				const errorResponse = error.data as ErrorResponse
-				const errorMessage = JSON.parse(errorResponse.title) as ErrorInformation
-				return new Err(errorMessage.msg)
+				const errorMessage = json_tryparse<ErrorInformation>(errorResponse.title)
+
+				if (errorMessage.isOk()) {
+					return Err(errorMessage.value.msg)
+				}
+
+				return Err(errorMessage.error)
 			}
 		} catch {
 			return new Err('Wrong username or password')
@@ -160,8 +182,13 @@ export async function get_user_info(access_token: string): Promise<Result<Profil
 		try {
 			if (error instanceof HTTPError) {
 				const errorResponse = error.data as ErrorResponse
-				const errorMessage = JSON.parse(errorResponse.title) as ErrorInformation
-				return new Err(errorMessage.msg)
+				const errorMessage = json_tryparse<ErrorInformation>(errorResponse.title)
+
+				if (errorMessage.isOk()) {
+					return Err(errorMessage.value.msg)
+				}
+
+				return Err(errorMessage.error)
 			}
 		} catch {
 			return new Err('Wrong username or password')
@@ -202,6 +229,67 @@ export async function get_timetable_by_id(
 			.json<TimetableResponse>()
 		return Ok(timetables)
 	} catch (error) {
+		return Err('Something went wrong ' + error)
+	}
+}
+
+export async function reset_password(
+	token_hash: string,
+	password: string
+): Promise<Result<string, string>> {
+	try {
+		const reset_password_db = create_ky_instance({
+			auth_token: '',
+			authorised: false,
+			unauthorizedCheck: false
+		}).extend({
+			json: {
+				tokenHash: token_hash,
+				password: password
+			}
+		})
+
+		await reset_password_db.post('/auth/reset-password')
+		return Ok('')
+	} catch (error) {
+		if (error instanceof HTTPError) {
+			const errorResponse = error.data as ErrorResponse
+			const errorMessage = json_tryparse<ErrorInformation>(errorResponse.title)
+
+			if (errorMessage.isOk()) {
+				return Err(errorMessage.value.msg)
+			}
+
+			return Err(errorMessage.error)
+		}
+		return Err('Something went wrong ' + error)
+	}
+}
+
+export async function forgot_password(email: string): Promise<Result<string, string>> {
+	try {
+		const forgot_password_db = create_ky_instance({
+			auth_token: '',
+			authorised: false,
+			unauthorizedCheck: false
+		}).extend({
+			json: {
+				email: email
+			}
+		})
+		await forgot_password_db.post('/auth/forgot-password')
+		return Ok('')
+	} catch (error) {
+		if (error instanceof HTTPError) {
+			const errorResponse = error.data as ErrorResponse
+			const errorMessage = json_tryparse<ErrorInformation>(errorResponse.title)
+
+			if (errorMessage.isOk()) {
+				return Err(errorMessage.value.msg)
+			}
+
+			return Err(errorMessage.error)
+		}
 		return Err('Something went wrong ' + error)
 	}
 }

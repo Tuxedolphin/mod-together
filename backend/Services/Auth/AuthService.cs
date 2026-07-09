@@ -1,14 +1,18 @@
 using System.Net.Http.Headers;
 using Backend.DTOs;
 using Backend.Exceptions;
+using Backend.Settings;
+using Microsoft.Extensions.Options;
 using Supabase;
 
 namespace Backend.Services.Auth;
 
-public class AuthService(Client supabase, IHttpClientFactory httpClientFactory) : IAuthService
+public class AuthService(Client supabase, IHttpClientFactory httpClientFactory, IWebHostEnvironment web) : IAuthService
 {
     private readonly Client _supabase = supabase;
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
+
+    private IWebHostEnvironment _webHostEnvironment = web;
 
     public async Task<AuthResponse> LoginAsync(LoginRequest request)
     {
@@ -98,7 +102,15 @@ public class AuthService(Client supabase, IHttpClientFactory httpClientFactory) 
 
     public async Task ForgotPasswordAsync(ForgotPasswordRequest request)
     {
-        const string redirectUrl = "https://mods-tgt.com";
+        string redirectUrl;
+        if (_webHostEnvironment.IsDevelopment())
+        {
+            redirectUrl = "http://localhost:5173";
+        }
+        else
+        {
+            redirectUrl = "https://mods-tgt.com";
+        }
 
         var response = await PostGotrueAsync(
             $"recover?redirect_to={Uri.EscapeDataString(redirectUrl)}",
@@ -108,9 +120,11 @@ public class AuthService(Client supabase, IHttpClientFactory httpClientFactory) 
         if (!response.IsSuccessStatusCode)
         {
             var error = await response.Content.ReadAsStringAsync();
+            // Same, log exception here but return JSON payload to client:
+            Console.WriteLine($"Recovery email failed, with status {(int)response.StatusCode} {response.StatusCode}. Details: {error} ");
 
             throw new ExternalServiceException(
-                $"Recovery email failed, with status {(int)response.StatusCode} {response.StatusCode}. Details: {error} "
+                error
             );
         }
     }
@@ -125,8 +139,10 @@ public class AuthService(Client supabase, IHttpClientFactory httpClientFactory) 
         if (!verifyResponse.IsSuccessStatusCode)
         {
             string error = await verifyResponse.Content.ReadAsStringAsync();
+            // Reported error here instead, frontend expects a JSON error response:
+            Console.WriteLine($"Recovery token invalid or expired. Status: {(int)verifyResponse.StatusCode}. Details: {error}");
             throw new ExternalServiceException(
-                $"Recovery token invalid or expired. Status: {(int)verifyResponse.StatusCode}. Details: {error}"
+               error
             );
         }
 
@@ -143,8 +159,9 @@ public class AuthService(Client supabase, IHttpClientFactory httpClientFactory) 
         if (!updateResponse.IsSuccessStatusCode)
         {
             string error = await updateResponse.Content.ReadAsStringAsync();
+            Console.WriteLine($"Password update failed. Status: {(int)updateResponse.StatusCode}. Details: {error}");
             throw new ExternalServiceException(
-                $"Password update failed. Status: {(int)updateResponse.StatusCode}. Details: {error}"
+                error
             );
         }
 
@@ -162,6 +179,10 @@ public class AuthService(Client supabase, IHttpClientFactory httpClientFactory) 
 
             // TODO: Add proper logging for this
             Console.WriteLine($"Logout error: {error}");
+
+            throw new ExternalServiceException(
+                error
+            );
         }
     }
 

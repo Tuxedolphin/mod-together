@@ -1,36 +1,46 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { register_db } from "$lib/utils/db_operations";
+  import ModTogetherHero from "$lib/components/LoginPage/ModTogetherHero.svelte";
+  import { reset_password } from "$lib/utils/db_operations";
+  import { sleep } from "$lib/utils/frontend_utils";
 
-  let emailInput = $state("");
+  let token_hash = $state("");
+  let type = $state("");
   let passwordInput = $state("");
   let confirmPasswordInput = $state("");
   let loading = $state(false);
   let error = $state("");
   let success = $state("");
+  onMount(() => {
+    const search_params = new URLSearchParams(window.location.search);
+
+    for (const [key, value] of search_params) {
+      if (key === "token_hash") {
+        token_hash = value;
+      }
+
+      if (key === "type") {
+        type = value;
+      }
+    }
+
+    if (token_hash === "" || type === "") {
+      goto(resolve("/"));
+    }
+  });
 </script>
 
-{#if success}
+<ModTogetherHero>
+  <p class="text-error text-wrap break-after-all">
+    {error}
+  </p>
   <p class="text-success text-wrap break-after-all">{success}</p>
-{:else}
   <fieldset
     class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4"
   >
-    <p class="text-error text-wrap break-after-all">
-      {error}
-    </p>
-
-    <legend class="fieldset-legend">Register</legend>
-
-    <!-- svelte-ignore a11y_label_has_associated_control -->
-    <label class="label">Email</label>
-    <input
-      type="email"
-      bind:value={emailInput}
-      class="input validator"
-      placeholder="Email"
-    />
+    <legend class="fieldset-legend">Reset Password!</legend>
 
     <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">Password</label>
@@ -38,7 +48,7 @@
       type="password"
       bind:value={passwordInput}
       class="input"
-      placeholder="Confirm Password"
+      placeholder="Password"
     />
 
     <!-- svelte-ignore a11y_label_has_associated_control -->
@@ -66,18 +76,21 @@
           loading = false;
           return;
         }
-        const result = await register_db(emailInput, passwordInput);
+        const result = await reset_password(token_hash, passwordInput);
 
         if (result.isErr()) {
           error = result.error;
         } else {
           success =
-            "Registration successful. A confirmation will be sent if email has not been used before. Check spam if necessary.";
+            "Password has been sucessfully changed! Redirecting to login...";
+          await sleep(3000);
+
+          goto(resolve("/login"));
         }
         loading = false;
       }}
     >
-      Register!</button
+      Reset Password!</button
     >
 
     <button
@@ -87,4 +100,4 @@
       }}>Back to login</button
     >
   </fieldset>
-{/if}
+</ModTogetherHero>
