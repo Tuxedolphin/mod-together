@@ -93,14 +93,19 @@ public class RoomService(
         return new RoomInformation(roomId, profilesOfUsers, timetablesInformation);
     }
 
-    public async Task<IReadOnlyCollection<ProfileResponse>?> GetProfilesInRoomAsync(Guid roomId)
+    public async Task<IReadOnlyCollection<RoomMemberResponse>?> GetProfilesInRoomAsync(Guid roomId)
     {
         if (!_roomTracker.GetUsersInRoom(roomId, out var users))
             return null;
 
-        return await users
-            .SelectAsync(FindOrAddProfileAsync)
-            .MapAsync(p => p.OfType<Profile>().Select(profile => profile.ToResponse()).ToList());
+        var roles = await _context
+            .RoomMembers.Where(m => m.RoomId == roomId && users.Contains(m.UserId))
+            .ToDictionaryAsync(m => m.UserId, m => m.Role);
+
+        return (await users.SelectAsync(FindOrAddProfileAsync))
+            .OfType<Profile>()
+            .Select(p => p.GetRoomMemberResponse(roles.GetValueOrDefault(p.Id, RoomRole.Editor)))
+            .ToList();
     }
 
     public async Task<IReadOnlyCollection<TimetableDetailedResponse>?> GetTimetablesDetailedInRoomAsync(

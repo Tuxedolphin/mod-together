@@ -28,7 +28,7 @@ public interface IRoomService
     );
 
     public Task<RoomInformation?> GetRoomInformationAsync(Guid roomId);
-    public Task<IReadOnlyCollection<ProfileResponse>?> GetProfilesInRoomAsync(Guid roomId);
+    public Task<IReadOnlyCollection<RoomMemberResponse>?> GetProfilesInRoomAsync(Guid roomId);
     public Task<IReadOnlyCollection<TimetableDetailedResponse>?> GetTimetablesDetailedInRoomAsync(
         Guid roomId
     );

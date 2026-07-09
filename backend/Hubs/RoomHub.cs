@@ -67,11 +67,12 @@ public class RoomHub(
 
     public async Task<RoomInformation> CreateOrJoinRoom(Guid roomId)
     {
-        // TODO: Check if the user is allowed to join the room before adding them to the group
-
         try
         {
             var userId = GetUserId();
+
+            // TODO: Check if the user is allowed to join the room before adding them to the group
+
             await _roomService.CreateOrJoinRoom(userId, roomId);
 
             await Groups.AddToGroupAsync(Context.ConnectionId, roomId.ToString());
@@ -133,8 +134,10 @@ public class RoomHub(
         try
         {
             var userId = GetUserId();
-            var timetableToCopyTo = await _timetableService
-                .GetTimetableByIdAsync(timetableIdToCopyTo, userId); 
+            var timetableToCopyTo = await _timetableService.GetTimetableByIdAsync(
+                timetableIdToCopyTo,
+                userId
+            );
             var timetable = await _timetableService
                 .GetTimetableByIdAsync(timetableId, userId)
                 .MapAsync(t => new UpdateTimetableRequest()
