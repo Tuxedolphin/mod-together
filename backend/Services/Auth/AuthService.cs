@@ -1,11 +1,13 @@
 using System.Net.Http.Headers;
 using Backend.DTOs;
 using Backend.Exceptions;
+using Backend.Settings;
+using Microsoft.Extensions.Options;
 using Supabase;
 
 namespace Backend.Services.Auth;
 
-public class AuthService(Client supabase, IOptions<SupabaseSettings> settings, IWebHostEnvironment web) : IAuthService
+public class AuthService(Client supabase, IHttpClientFactory httpClientFactory, IWebHostEnvironment web) : IAuthService
 {
     private readonly Client _supabase = supabase;
     private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;

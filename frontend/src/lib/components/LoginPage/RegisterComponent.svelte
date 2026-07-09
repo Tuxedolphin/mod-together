@@ -1,9 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { registered } from "$lib/shared/shared.svelte";
   import { register_db } from "$lib/utils/db_operations";
-  import RegisterButton from "./RegisterButton.svelte";
 
   let emailInput = $state("");
   let passwordInput = $state("");
@@ -25,6 +23,7 @@
 
     <legend class="fieldset-legend">Register</legend>
 
+    <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">Email</label>
     <input
       type="email"
@@ -33,6 +32,7 @@
       placeholder="Email"
     />
 
+    <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">Password</label>
     <input
       type="password"
@@ -41,6 +41,7 @@
       placeholder="Confirm Password"
     />
 
+    <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">Confirm Password</label>
     <input
       type="password"

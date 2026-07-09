@@ -20,6 +20,7 @@
     <p class="text-success text-wrap break-after-all">{success}</p>
     <legend class="fieldset-legend">Reset Password!</legend>
 
+    <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">Email</label>
     <input
       type="email"

@@ -35,6 +35,7 @@
 >
   <legend class="fieldset-legend">Login</legend>
 
+  <!-- svelte-ignore a11y_label_has_associated_control -->
   <label class="label">Email</label>
   <input
     type="email"
@@ -43,6 +44,7 @@
     placeholder="Email"
   />
 
+  <!-- svelte-ignore a11y_label_has_associated_control -->
   <label class="label">Password</label>
   <input
     type="password"

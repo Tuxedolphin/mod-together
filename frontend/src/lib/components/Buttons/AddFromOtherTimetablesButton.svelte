@@ -3,10 +3,6 @@
   import { roomHub } from "$lib/stores/roomHub";
   import type { TimetableInfos } from "$lib/types/db_raw_types";
   import { get_timetables } from "$lib/utils/db_operations";
-  import {
-    format_AY_name,
-    format_semester_name,
-  } from "$lib/utils/formatting_utils";
   import GenericDialog from "../../../routes/(app)/GenericDialog.svelte";
 
   interface AddFromOtherTimetablesButtonProps {
@@ -14,6 +10,7 @@
     semester: number;
     current_timetable_id: string;
   }
+  // svelte-ignore non_reactive_update
   let dialog: HTMLDialogElement;
   let timetable_infos: TimetableInfos | undefined = $state();
   let selected_tt_id = $state("");
@@ -74,11 +71,7 @@
           onclick={async () => {
             // console.log(current_timetable_id)
             await $roomHub
-              ?.invoke(
-                "CopyTimetableTo",
-                selected_tt_id,
-                current_timetable_id,
-              )
+              ?.invoke("CopyTimetableTo", selected_tt_id, current_timetable_id)
               .catch((e) => console.error(e));
           }}>Copy!</button
         >

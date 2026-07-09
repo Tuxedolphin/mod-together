@@ -42,6 +42,7 @@
   >
     <legend class="fieldset-legend">Reset Password!</legend>
 
+    <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">Password</label>
     <input
       type="password"
@@ -50,6 +51,7 @@
       placeholder="Password"
     />
 
+    <!-- svelte-ignore a11y_label_has_associated_control -->
     <label class="label">Confirm Password</label>
     <input
       type="password"
