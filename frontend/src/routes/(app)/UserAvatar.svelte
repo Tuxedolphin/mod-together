@@ -62,5 +62,6 @@
     /*Intentially Left Empty*/
   }}
 >
-  <ProfilePictureChangeComponent></ProfilePictureChangeComponent>
+  <ProfilePictureChangeComponent parentDialog={change_image_dialog}
+  ></ProfilePictureChangeComponent>
 </GenericDialog>

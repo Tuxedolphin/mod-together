@@ -1,8 +1,18 @@
 <script lang="ts">
+  import { token_information } from "$lib/shared/shared.svelte";
+  import { update_user_profile_photo } from "$lib/utils/db_operations";
   import Cropper, { type CropArea } from "svelte-easy-crop";
   // taken from cropper documentation:
   // https://valentinh.github.io/react-easy-crop/docs/examples/output
+
+  interface ProfilePictureChangeComponentProps {
+    parentDialog: HTMLDialogElement;
+  }
+
+  let { parentDialog }: ProfilePictureChangeComponentProps = $props();
+
   let image_files: FileList | undefined = $state();
+
   let image = $state();
   let crop = $state({ x: 0, y: 0 });
   let zoom = $state(1);
@@ -64,9 +74,9 @@
       pixelCrop.height,
     );
 
-    return new Promise<string | null>((resolve) => {
+    return new Promise<Blob | null>((resolve) => {
       croppedCanvas.toBlob((file) => {
-        resolve(file ? URL.createObjectURL(file) : null);
+        resolve(file ? file : null);
       }, "image/jpeg");
     });
   }
@@ -129,7 +139,21 @@
       class="btn btn-accent"
       onclick={async () => {
         const cropped_image = await getCroppedImg(image, crop_area);
-        console.log(cropped_image);
+        const result = await update_user_profile_photo(
+          cropped_image!,
+          $token_information.a,
+        );
+
+        if (result.isOk()) {
+          image = "";
+          crop_area = {
+            height: 0,
+            width: 0,
+            x: 0,
+            y: 0,
+          };
+          parentDialog.close();
+        }
       }}>Upload Image</button
     >
   {/if}
