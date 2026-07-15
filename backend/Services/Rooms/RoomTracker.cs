@@ -1,60 +1,182 @@
 using System.Collections.Concurrent;
+using Backend.DTOs;
+using Backend.Exceptions;
 using Backend.Infrastructure;
 
 namespace Backend.Services.Rooms;
 
 public class RoomTracker : IRoomTracker
 {
+    private record ConnectionSession(Guid UserId, Guid? RoomId);
+
     private record RoomState
     {
-        public ConcurrentHashSet<Guid> Users { get; init; } = [];
-
         public ConcurrentHashSet<Guid> Editors { get; init; } = [];
 
-        public ConcurrentHashSet<Guid> Visitors { get; init; } = [];
+        public ConcurrentHashSet<Guid> Viewers { get; init; } = [];
         public ConcurrentDictionary<Guid, RoomTimetable> Timetables { get; init; } = new();
     }
 
-    private readonly ConcurrentDictionary<Guid, Guid> _userToRoomMap = new();
+    private readonly ConcurrentDictionary<string, ConnectionSession> _connections = new();
 
-    // We maintain both room to users and room to timetables even though time table as userId
-    // as not every user may have a timetable
     private readonly ConcurrentDictionary<Guid, RoomState> _rooms = new();
 
     private readonly ConcurrentHashSet<Guid> _changedTimetables = [];
-
-    // Dict of roomId: Hash set of timetableIds
     private readonly ConcurrentDictionary<Guid, ConcurrentHashSet<Guid>> _deletedTimetables = [];
 
-    public bool AddRoom(Guid roomId)
-    {
-        return _rooms.TryAdd(roomId, new RoomState());
-    }
+    public bool AddRoom(Guid roomId) => _rooms.TryAdd(roomId, new RoomState());
 
-    public bool RoomExists(Guid roomId)
-    {
-        return _rooms.ContainsKey(roomId);
-    }
+    public bool RoomExists(Guid roomId) => _rooms.ContainsKey(roomId);
 
-    public bool AddUserToRoom(Guid userId, Guid roomId)
+    public bool RegisterConnection(string connectionId, Guid userId) =>
+        _connections.TryAdd(connectionId, new ConnectionSession(userId, null));
+
+    public RoomConnectionMove MoveConnectionToRoom(string connectionId, Guid userId, Guid roomId)
     {
-        if (_rooms.TryGetValue(roomId, out var roomState))
+        if (!_rooms.TryGetValue(roomId, out var roomState))
+            throw new InvalidOperationException($"Room {roomId} is not tracked.");
+
+        lock (roomState)
         {
-            if (GetRoomOfUser(userId, out var oldRoomId) && oldRoomId != roomId)
-                RemoveUserFromRoom(userId, oldRoomId);
+            if (
+                !_rooms.TryGetValue(roomId, out var currentRoomState)
+                || !ReferenceEquals(roomState, currentRoomState)
+            )
+            {
+                throw new InvalidOperationException($"Room {roomId} is no longer tracked.");
+            }
 
-            roomState.Users.Add(userId);
-            _userToRoomMap[userId] = roomId;
+            if (!CanViewRoom(roomId, roomState, userId))
+                throw new ForbiddenException("User does not have permission to enter the room");
+
+            while (_connections.TryGetValue(connectionId, out var currentConnection))
+            {
+                if (currentConnection.UserId != userId)
+                {
+                    throw new UnauthorizedAccessException(
+                        $"Connection {connectionId} does not belong to user {userId}."
+                    );
+                }
+
+                if (currentConnection.RoomId == roomId)
+                    return new RoomConnectionMove(roomId);
+
+                var updatedConnection = currentConnection with { RoomId = roomId };
+                if (_connections.TryUpdate(connectionId, updatedConnection, currentConnection))
+                {
+                    return new RoomConnectionMove(currentConnection.RoomId);
+                }
+            }
+
+            throw new InvalidOperationException($"Connection {connectionId} is not registered.");
+        }
+    }
+
+    public RoomConnectionDeparture? LeaveConnectionFromRoom(string connectionId, Guid roomId)
+    {
+        if (!_connections.TryGetValue(connectionId, out var initialConnection))
+            return null;
+
+        if (initialConnection.RoomId != roomId)
+            return null;
+
+        if (!_rooms.TryGetValue(roomId, out var roomState))
+            return LeaveUntrackedRoom(connectionId, roomId);
+
+        lock (roomState)
+        {
+            while (_connections.TryGetValue(connectionId, out var currentConnection))
+            {
+                if (currentConnection.RoomId != roomId)
+                    return null;
+
+                var updatedConnection = currentConnection with { RoomId = null };
+                if (_connections.TryUpdate(connectionId, updatedConnection, currentConnection))
+                {
+                    return new RoomConnectionDeparture(currentConnection.UserId);
+                }
+            }
+
+            return null;
+        }
+    }
+
+    public ConnectionRemoval? RemoveConnection(string connectionId)
+    {
+        if (!_connections.TryRemove(connectionId, out var removedConnection))
+            return null;
+
+        return new ConnectionRemoval(
+            removedConnection.UserId,
+            removedConnection.RoomId,
+            !HasConnections(removedConnection.UserId)
+        );
+    }
+
+    public bool GetRoomOfConnection(string connectionId, out Guid roomId)
+    {
+        if (
+            _connections.TryGetValue(connectionId, out var connection)
+            && connection.RoomId is { } currentRoomId
+        )
+        {
+            roomId = currentRoomId;
             return true;
         }
 
+        roomId = default;
         return false;
     }
 
-    public bool GetRoomOfUser(Guid userId, out Guid roomId)
+    public bool IsConnectionInRoom(string connectionId, Guid roomId) =>
+        _connections.TryGetValue(connectionId, out var connection) && connection.RoomId == roomId;
+
+    private bool HasConnections(Guid userId) =>
+        _connections.Values.Any(connection => connection.UserId == userId);
+
+    public bool GetUsersInRoom(Guid roomId, out IReadOnlyCollection<Guid> users)
     {
-        return _userToRoomMap.TryGetValue(userId, out roomId);
+        if (!_rooms.ContainsKey(roomId))
+        {
+            users = [];
+            return false;
+        }
+
+        users =
+        [
+            .. _connections
+                .Values.Where(connection => connection.RoomId == roomId)
+                .Select(connection => connection.UserId)
+                .Distinct(),
+        ];
+
+        return true;
     }
+
+    private RoomConnectionDeparture? LeaveUntrackedRoom(string connectionId, Guid roomId)
+    {
+        while (_connections.TryGetValue(connectionId, out var currentConnection))
+        {
+            if (currentConnection.RoomId != roomId)
+                return null;
+
+            var updatedConnection = currentConnection with { RoomId = null };
+            if (_connections.TryUpdate(connectionId, updatedConnection, currentConnection))
+            {
+                return new RoomConnectionDeparture(currentConnection.UserId);
+            }
+        }
+
+        return null;
+    }
+
+    private bool HasConnectionsInRoom(Guid roomId) =>
+        _connections.Values.Any(connection => connection.RoomId == roomId);
+
+    private static bool CanViewRoom(Guid roomId, RoomState roomState, Guid userId) =>
+        roomState.Editors.Contains(userId)
+        || roomState.Viewers.Contains(userId)
+        || roomState.Timetables.GetValueOrDefault(roomId)?.UserId == userId;
 
     public bool GetTimetablesInRoom(Guid roomId, out IReadOnlyCollection<RoomTimetable> timetables)
     {
@@ -64,41 +186,76 @@ public class RoomTracker : IRoomTracker
         return found;
     }
 
-    public bool GetUsersInRoom(Guid roomId, out IReadOnlyCollection<Guid> users)
+    public bool SetMemberRole(Guid roomId, Guid userId, RoomRole role)
     {
-        var found = _rooms.TryGetValue(roomId, out var roomState);
-        users = found ? roomState!.Users.ToArray() : [];
+        if (!_rooms.TryGetValue(roomId, out var roomState))
+            return false;
 
-        return found;
-    }
-
-    public bool RemoveUserFromRoom(Guid userId, Guid roomId)
-    {
-        if (_rooms.TryGetValue(roomId, out var roomState))
+        if (role is not RoomRole.Editor and not RoomRole.Viewer)
         {
-            roomState.Users.Remove(userId);
-            _userToRoomMap.TryRemove(userId, out _);
+            throw new ArgumentOutOfRangeException(
+                nameof(role),
+                role,
+                "Members must be editors or viewers."
+            );
+        }
 
-            // We don't remove the timetable from here as the timetable should be independent
-            // of whether the user is in the room
+        lock (roomState)
+        {
+            if (
+                !_rooms.TryGetValue(roomId, out var currentRoomState)
+                || !ReferenceEquals(roomState, currentRoomState)
+            )
+            {
+                return false;
+            }
+
+            roomState.Editors.Remove(userId);
+            roomState.Viewers.Remove(userId);
+
+            if (role == RoomRole.Editor)
+                roomState.Editors.Add(userId);
+            else
+                roomState.Viewers.Add(userId);
 
             return true;
         }
-
-        // We don't silently fail here for logging purposes
-        return false;
     }
 
-    public bool SetEditors(Guid roomId, IReadOnlyCollection<Guid> editors)
+    public IReadOnlyCollection<string> RemoveMemberRoleAndConnections(Guid roomId, Guid userId)
     {
-        if (_rooms.TryGetValue(roomId, out var roomState))
-        {
-            roomState.Editors.Clear();
-            editors.ToList().ForEach(e => roomState.Editors.Add(e));
-            return true;
-        }
+        if (!_rooms.TryGetValue(roomId, out var roomState))
+            return [];
 
-        return false;
+        lock (roomState)
+        {
+            roomState.Editors.Remove(userId);
+            roomState.Viewers.Remove(userId);
+
+            var removedConnections = new List<string>();
+            foreach (var entry in _connections)
+            {
+                var currentConnection = entry.Value;
+                if (currentConnection.UserId != userId || currentConnection.RoomId != roomId)
+                    continue;
+
+                while (
+                    _connections.TryGetValue(entry.Key, out currentConnection)
+                    && currentConnection.UserId == userId
+                    && currentConnection.RoomId == roomId
+                )
+                {
+                    var updatedConnection = currentConnection with { RoomId = null };
+                    if (_connections.TryUpdate(entry.Key, updatedConnection, currentConnection))
+                    {
+                        removedConnections.Add(entry.Key);
+                        break;
+                    }
+                }
+            }
+
+            return removedConnections;
+        }
     }
 
     public bool GetEditorsInRoom(Guid roomId, out IReadOnlyCollection<Guid> editors)
@@ -109,22 +266,10 @@ public class RoomTracker : IRoomTracker
         return found;
     }
 
-    public bool SetVisitors(Guid roomId, IReadOnlyCollection<Guid> visitors)
-    {
-        if (_rooms.TryGetValue(roomId, out var roomState))
-        {
-            roomState.Visitors.Clear();
-            visitors.ToList().ForEach(v => roomState.Visitors.Add(v));
-            return true;
-        }
-
-        return false;
-    }
-
-    public bool GetVisitorsInRoom(Guid roomId, out IReadOnlyCollection<Guid> visitors)
+    public bool GetViewersInRoom(Guid roomId, out IReadOnlyCollection<Guid> viewers)
     {
         var found = _rooms.TryGetValue(roomId, out var roomState);
-        visitors = found ? roomState!.Visitors.ToArray() : [];
+        viewers = found ? roomState!.Viewers.ToArray() : [];
 
         return found;
     }
@@ -171,9 +316,8 @@ public class RoomTracker : IRoomTracker
 
         var roomState = new RoomState
         {
-            Users = [.. init.Users],
             Editors = [.. init.Editors],
-            Visitors = [.. init.Visitors],
+            Viewers = [.. init.Viewers],
             Timetables = new ConcurrentDictionary<Guid, RoomTimetable>(
                 init.Timetables.ToDictionary(t => t.Id, t => t)
             ),
@@ -184,21 +328,16 @@ public class RoomTracker : IRoomTracker
 
     public bool CloseRoom(Guid roomId)
     {
-        bool success = _rooms.TryRemove(roomId, out RoomState? roomState);
+        if (!_rooms.TryGetValue(roomId, out var roomState))
+            return false;
 
-        if (roomState?.Users.IsEmpty == false)
+        lock (roomState)
         {
-            roomState
-                .Users.ToList()
-                .ForEach(userId =>
-                {
-                    _userToRoomMap.TryRemove(userId, out _);
-                    roomState.Users.Remove(userId);
-                });
-        }
+            if (HasConnectionsInRoom(roomId))
+                return false;
 
-        // We don't silently fail, even though the behaviour is the same, for logging purposes
-        return success;
+            return _rooms.TryRemove(roomId, out _);
+        }
     }
 
     public RoomTimetable? GetTimetableById(Guid roomId, Guid timetableId) =>
