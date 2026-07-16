@@ -14,7 +14,7 @@ namespace Backend.Tests.Unit;
 public class RoomHubTests
 {
     [Fact]
-    public async Task SetMemberRole_BroadcastsUpdatedRoomMembers()
+    public async Task SetMemberRoleAsync_BroadcastsUpdatedRoomMembers()
     {
         var callerId = Guid.NewGuid();
         var memberId = Guid.NewGuid();
@@ -22,14 +22,16 @@ public class RoomHubTests
         var updatedMembers = new List<RoomMemberResponse>();
         var (hub, service, roomClient, _) = CreateHub(callerId, roomId, updatedMembers);
 
-        await hub.SetMemberRole(memberId, roomId, RoomRole.Viewer);
+        await hub.SetMemberRoleAsync(memberId, roomId, RoomRole.Viewer);
 
-        await service.Received(1).SetMemberRole(roomId, memberId, RoomRole.Viewer, callerId);
+        await service
+            .Received(1)
+            .SetMemberRoleAsync(roomId, memberId, RoomRole.Viewer, callerId);
         await roomClient.Received(1).ReceiveRoomMembersUpdate(updatedMembers);
     }
 
     [Fact]
-    public async Task RevokeMemberAccess_RemovesConnectionsFromGroupAndBroadcastsUpdatedMembers()
+    public async Task RevokeMemberAccessAsync_RemovesConnectionsFromGroupAndBroadcastsUpdatedMembers()
     {
         var callerId = Guid.NewGuid();
         var memberId = Guid.NewGuid();
@@ -39,12 +41,12 @@ public class RoomHubTests
             ["member-connection-1", "member-connection-2"];
         var (hub, service, roomClient, groups) = CreateHub(callerId, roomId, updatedMembers);
         service
-            .RevokeMemberAccess(roomId, memberId, callerId)
+            .RevokeMemberAccessAsync(roomId, memberId, callerId)
             .Returns(removedConnectionIds);
 
-        await hub.RevokeMemberAccess(memberId, roomId);
+        await hub.RevokeMemberAccessAsync(memberId, roomId);
 
-        await service.Received(1).RevokeMemberAccess(roomId, memberId, callerId);
+        await service.Received(1).RevokeMemberAccessAsync(roomId, memberId, callerId);
         foreach (var connectionId in removedConnectionIds)
         {
             await groups

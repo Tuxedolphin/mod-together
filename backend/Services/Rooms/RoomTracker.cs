@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using Backend.DTOs;
 using Backend.Exceptions;
 using Backend.Infrastructure;
+using Backend.Models;
 
 namespace Backend.Services.Rooms;
 
@@ -15,6 +16,8 @@ public class RoomTracker : IRoomTracker
 
         public ConcurrentHashSet<Guid> Viewers { get; init; } = [];
         public ConcurrentDictionary<Guid, RoomTimetable> Timetables { get; init; } = new();
+
+        public Visibility Visibility = Visibility.Restricted;
     }
 
     private readonly ConcurrentDictionary<string, ConnectionSession> _connections = new();
@@ -63,9 +66,7 @@ public class RoomTracker : IRoomTracker
 
                 var updatedConnection = currentConnection with { RoomId = roomId };
                 if (_connections.TryUpdate(connectionId, updatedConnection, currentConnection))
-                {
                     return new RoomConnectionMove(currentConnection.RoomId);
-                }
             }
 
             throw new InvalidOperationException($"Connection {connectionId} is not registered.");
@@ -113,7 +114,7 @@ public class RoomTracker : IRoomTracker
         );
     }
 
-    public bool GetRoomOfConnection(string connectionId, out Guid roomId)
+    public bool TryGetRoomOfConnection(string connectionId, out Guid roomId)
     {
         if (
             _connections.TryGetValue(connectionId, out var connection)
@@ -134,7 +135,7 @@ public class RoomTracker : IRoomTracker
     private bool HasConnections(Guid userId) =>
         _connections.Values.Any(connection => connection.UserId == userId);
 
-    public bool GetUsersInRoom(Guid roomId, out IReadOnlyCollection<Guid> users)
+    public bool TryGetUsersInRoom(Guid roomId, out IReadOnlyCollection<Guid> users)
     {
         if (!_rooms.ContainsKey(roomId))
         {
@@ -173,12 +174,18 @@ public class RoomTracker : IRoomTracker
     private bool HasConnectionsInRoom(Guid roomId) =>
         _connections.Values.Any(connection => connection.RoomId == roomId);
 
-    private static bool CanViewRoom(Guid roomId, RoomState roomState, Guid userId) =>
-        roomState.Editors.Contains(userId)
-        || roomState.Viewers.Contains(userId)
-        || roomState.Timetables.GetValueOrDefault(roomId)?.UserId == userId;
+    private static bool CanViewRoom(Guid roomId, RoomState roomState, Guid userId)
+    {
+        return roomState.Visibility is Visibility.PublicView or Visibility.PublicEdit
+            || roomState.Editors.Contains(userId)
+            || roomState.Viewers.Contains(userId)
+            || roomState.Timetables.GetValueOrDefault(roomId)?.UserId == userId;
+    }
 
-    public bool GetTimetablesInRoom(Guid roomId, out IReadOnlyCollection<RoomTimetable> timetables)
+    public bool TryGetTimetablesInRoom(
+        Guid roomId,
+        out IReadOnlyCollection<RoomTimetable> timetables
+    )
     {
         var found = _rooms.TryGetValue(roomId, out var roomState);
         timetables = found ? [.. roomState!.Timetables.Values] : [];
@@ -258,7 +265,7 @@ public class RoomTracker : IRoomTracker
         }
     }
 
-    public bool GetEditorsInRoom(Guid roomId, out IReadOnlyCollection<Guid> editors)
+    public bool TryGetEditorsInRoom(Guid roomId, out IReadOnlyCollection<Guid> editors)
     {
         var found = _rooms.TryGetValue(roomId, out var roomState);
         editors = found ? roomState!.Editors.ToArray() : [];
@@ -266,10 +273,18 @@ public class RoomTracker : IRoomTracker
         return found;
     }
 
-    public bool GetViewersInRoom(Guid roomId, out IReadOnlyCollection<Guid> viewers)
+    public bool TryGetViewersInRoom(Guid roomId, out IReadOnlyCollection<Guid> viewers)
     {
         var found = _rooms.TryGetValue(roomId, out var roomState);
         viewers = found ? roomState!.Viewers.ToArray() : [];
+
+        return found;
+    }
+
+    public bool TryGetVisibilityOfRoom(Guid roomId, out Visibility visibility)
+    {
+        var found = _rooms.TryGetValue(roomId, out var roomState);
+        visibility = found ? roomState!.Visibility : Visibility.Restricted;
 
         return found;
     }
@@ -321,6 +336,7 @@ public class RoomTracker : IRoomTracker
             Timetables = new ConcurrentDictionary<Guid, RoomTimetable>(
                 init.Timetables.ToDictionary(t => t.Id, t => t)
             ),
+            Visibility = init.Visibility,
         };
 
         return _rooms.TryAdd(roomId, roomState);
@@ -345,9 +361,12 @@ public class RoomTracker : IRoomTracker
             ? roomInfo.Timetables.GetValueOrDefault(timetableId)
             : null;
 
-    public bool GetChangedTimetables(Guid roomId, out IReadOnlyCollection<RoomTimetable> timetables)
+    public bool TryGetChangedTimetables(
+        Guid roomId,
+        out IReadOnlyCollection<RoomTimetable> timetables
+    )
     {
-        if (!GetTimetablesInRoom(roomId, out timetables))
+        if (!TryGetTimetablesInRoom(roomId, out timetables))
             return false;
 
         timetables = [.. timetables.Where(t => _changedTimetables.Contains(t.Id))];
