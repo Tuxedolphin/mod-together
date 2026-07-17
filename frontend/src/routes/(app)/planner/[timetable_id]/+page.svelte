@@ -1,4 +1,6 @@
 <script lang="ts">
+  import ShareTimetableDialog from "./ShareTimetableDialog.svelte";
+
   import { CircleX, TriangleAlert } from "@lucide/svelte";
   import { onDestroy, onMount } from "svelte";
   import type { Unsubscriber } from "svelte/store";
@@ -19,6 +21,7 @@
   import type {
     Profile,
     RoomInformation,
+    RoomProfile,
     TimetableDetailedResponse,
     TimetablePostTemplate,
     TimetableResponse,
@@ -32,7 +35,7 @@
   import type { PageProps } from "./$types";
 
   let is_timetable_loaded = $state(false);
-  let profiles: Profile[] = $state([]);
+  let profiles: RoomProfile[] = $state([]);
   let timetable_metadata: TimetableResponse = $state({
     academicYear: "",
     createdAt: "",
@@ -43,7 +46,6 @@
   });
   // svelte-ignore non_reactive_update
   let share_tt_dialog: HTMLDialogElement;
-  let copy_text = $state("Copy Link!");
   let currentTimetableDisplay = $derived(
     getTimetable(
       timetable_metadata.academicYear,
@@ -58,6 +60,7 @@
   let user_tt: TimetableDetailedResponse | undefined;
   let error = $state("");
   onMount(async () => {
+    share_tt_dialog.show();
     let first_time_subscribe = true;
     let update_from_room = false;
 
@@ -69,10 +72,12 @@
         params.timetable_id,
       );
 
+      console.log(info);
+
       is_timetable_loaded = false;
 
       timetable_metadata = info!.timetables[0];
-      profiles = info!.users;
+      profiles = info!.members;
       $currentlySelectedMods = info!.timetables;
 
       $roomHub?.on(
@@ -92,7 +97,8 @@
           $currentlySelectedMods = msg;
         },
       );
-      $roomHub?.on("ReceiveUserUpdate", (msg: Profile[]) => {
+      $roomHub?.on("ReceiveRoomMembersUpdate", (msg: RoomProfile[]) => {
+        console.log(msg);
         profiles = msg;
       });
 
@@ -219,17 +225,5 @@
   </div>
 {/if}
 
-<GenericDialog
-  bind:dialog={share_tt_dialog}
-  closeHandler={() => (copy_text = "Copy Link!")}
->
-  <h3 class="pb-2 text-lg font-bold">Share this timetable!</h3>
-
-  <button
-    class="btn w-full btn-primary"
-    onclick={async () => {
-      copy_text = "Link Copied!";
-      await navigator.clipboard.writeText(window.location.href);
-    }}>{copy_text}</button
-  >
-</GenericDialog>
+<ShareTimetableDialog {profiles} {timetable_metadata} bind:share_tt_dialog
+></ShareTimetableDialog>

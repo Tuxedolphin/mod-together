@@ -12,6 +12,11 @@ export interface Profile {
   handle: string | null;
 }
 
+export interface RoomProfile extends Profile {
+  role: "owner" | "editor" | "viewer";
+  isInRoom: boolean;
+}
+
 export interface AuthSucessResponse {
   message: string;
 }
@@ -44,7 +49,7 @@ export interface TimetableResponse extends TimetableSummaryResponse {
 
 export interface RoomInformation {
   roomId: string;
-  users: Profile[];
+  members: Profile[];
   timetables: TimetableDetailedResponse[];
 }
 
