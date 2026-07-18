@@ -5,6 +5,17 @@ export interface AuthResponse {
   tokenType: string;
 }
 
+export interface HandleAvailabilityResponse {
+  available: boolean;
+  reason:
+    | null
+    | "taken"
+    | "reserved"
+    | "invalidFormat"
+    | "tooShort"
+    | "tooLong";
+}
+
 export interface Profile {
   userId: string;
   username: string | null;
@@ -25,6 +36,15 @@ export interface ErrorResponse {
   type: string;
   title: string;
   status: number;
+}
+
+export interface ProfileValidationErrorResponse extends ErrorResponse {
+  errors: ProfileValidationErrors;
+}
+
+export interface ProfileValidationErrors {
+  Handle: string[];
+  Username: string[];
 }
 
 export interface ErrorInformation {

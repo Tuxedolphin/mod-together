@@ -1,15 +1,18 @@
 <script lang="ts">
-  import GreetingComponent from "$lib/components/GreetingComponent.svelte";
   import UserAvatarComponent from "$lib/components/Profile/UserAvatarComponent.svelte";
   import { onMount } from "svelte";
   import type { PageProps } from "./$types";
-  import { delete_user, get_user_info } from "$lib/utils/db_operations";
+  import {
+    check_handle,
+    delete_user,
+    get_user_info,
+    update_user_profile,
+  } from "$lib/utils/db_operations";
   import {
     currentUserInformation,
     token_information,
   } from "$lib/shared/shared.svelte";
   import type { Profile } from "$lib/types/db_raw_types";
-  import { redirect } from "@sveltejs/kit";
 
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -17,6 +20,7 @@
   import { Pencil } from "@lucide/svelte";
   import ProfilePictureChangeComponent from "../ProfilePictureChangeComponent.svelte";
   import GenericDialog from "../GenericDialog.svelte";
+  import { debounce } from "es-toolkit/function";
 
   let { data }: PageProps = $props();
   let current_user_info = $state({} as Profile);
@@ -27,6 +31,7 @@
   let change_image_dialog: HTMLDialogElement;
 
   let delete_error = $state("");
+
   onMount(async () => {
     const user_info = await get_user_info($token_information.a, false);
 
@@ -35,7 +40,68 @@
     }
   });
 
+  // Handle:
+  let handle_error = $state("");
+  let handle_success = $state("");
+  let check_handle_state = $state("");
+  const query_available_handle = debounce(async (handle: string) => {
+    const result = await check_handle(handle, $token_information.a);
+
+    if (result.isOk()) {
+      check_handle_state = handle_success = handle_error = "";
+
+      if (!result.value.available) {
+        switch (result.value.reason) {
+          case "invalidFormat":
+            handle_error = "Handle is in an invalid format, please try again";
+            break;
+          case "reserved":
+            handle_error =
+              "Handle has already been reserved. Please try another";
+            break;
+          case "taken":
+            handle_error = "Handle is taken, please try another.";
+            break;
+          case "tooLong":
+            handle_error = "Handle is too long, please try another.";
+            break;
+          case "tooShort":
+            handle_error =
+              "Handle is too short, must be at least 4 characters.";
+            break;
+          default:
+            break;
+        }
+
+        return;
+      }
+
+      handle_success = "Handle is available!";
+      return;
+    }
+
+    check_handle_state = handle_success = handle_error = "";
+    handle_error = result.error;
+  }, 500);
+
+  async function update_account() {
+    handle_error = "";
+    loading = true;
+    const change = await update_user_profile(
+      current_user_info,
+      $token_information.a,
+    );
+
+    if (change.isOk()) {
+      window.location.reload();
+    } else {
+      handle_error = change.error;
+    }
+    loading = false;
+  }
+
   async function delete_account() {
+    handle_error = "";
     loading = true;
     const result = await delete_user($token_information.a);
 
@@ -76,10 +142,35 @@
 
   <fieldset class="fieldset">
     <legend class="fieldset-legend">Your Handle</legend>
-    <input type="text" class="input" bind:value={current_user_info.handle} />
+
+    <input
+      type="text"
+      class="input"
+      bind:value={current_user_info.handle}
+      oninput={async (new_text) => {
+        check_handle_state = handle_success = handle_error = "";
+        check_handle_state = "Checking Handle availability...";
+        query_available_handle(current_user_info.handle!);
+      }}
+    />
+    {#if handle_error}
+      <p class="text-error">{handle_error}</p>
+    {/if}
+
+    {#if check_handle_state}
+      <p class="italic">{check_handle_state}</p>
+    {/if}
+
+    {#if handle_success}
+      <p class="text-success">{handle_success}</p>
+    {/if}
   </fieldset>
   <fieldset class="fieldset">
-    <button class="btn btn-primary max-w-xs {loading ? 'btn-disabled' : ''}"
+    <button
+      onclick={async () => {
+        await update_account();
+      }}
+      class="btn btn-primary max-w-xs {loading ? 'btn-disabled' : ''}"
       >Save Changes</button
     >
   </fieldset>
