@@ -7,15 +7,16 @@ import { page } from '$app/state';
  
   interface NavigationLargeItemInfo {
     information: NavigationItemProp,
+    top_bar: boolean
   }
   let {information}: NavigationLargeItemInfo = $props();
   let selected = $derived(page.url.pathname.includes(information.path));
 </script>
 
-<div class="flex items-center gap-1 {selected ? "bg-base-300" : ""} rounded-4xl h-12 pl-4 mr-2" onclick={() => {
+<div class="flex items-center justify-center md:justify-normal gap-1 {selected ? "bg-base-300" : ""} rounded-4xl h-12 md:pl-4 md:mr-2 md:w-auto w-full" onclick={() => {
     goto(information.path)
 }}>
   {const Icon = $derived(information.icon)}
   <Icon />
-  <p>{information.title}</p>
+  <p class="hidden xl:block">{information.title}</p>
 </div>

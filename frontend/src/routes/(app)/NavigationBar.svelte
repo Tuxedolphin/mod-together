@@ -2,6 +2,7 @@
   import NavItemLargeScreen from "./NavItemLargeScreen.svelte";
 
   import {
+    Calendar1,
     Home,
     House,
     Menu,
@@ -27,6 +28,7 @@
 
   const navigation_items: NavigationItemProp[] = [
     { icon: House, title: "Home", path: "/home" },
+    { icon: Calendar1, title: "Planner", path: "/planner" },
     { icon: Share2, title: "Shared with me", path: "/shared" },
     { icon: UserRound, title: "Profile", path: "/me" },
     { icon: Settings2, title: "Settings", path: "/settings" },
@@ -48,30 +50,23 @@
         alt="Mods Together Logo"
       />
     </div>
-    <!-- <div class="flex items-center gap-4">
-      <div class="flex gap-1">
-        <Share2></Share2>
-        <p>Shared</p>
-      </div>
-      <div class="flex gap-1">
-        <House></House>
-        <p>Home</p>
-      </div>
-      <div class="flex gap-1">
-        <House></House>
-        <p>Home</p>
-      </div>
-    </div> -->
+
     <div class="flex items-center gap-1">
       <p>@{$currentUserInformation.handle}</p>
       <UserAvatar></UserAvatar>
     </div>
   </div>
 </div>
-
+<div class="container mx-auto">
+  <div class="flex items-center justify-between w-full md:hidden px-2 pt-1">
+    {#each navigation_items as item}
+      <NavItemLargeScreen information={item}></NavItemLargeScreen>
+    {/each}
+  </div>
+</div>
 <div class="container mx-auto px-2 md:px-0">
   <div class="flex">
-    <div class="flex flex-col gap-2 min-w-48 mt-4">
+    <div class="md:flex flex-col gap-1 hidden md:min-w-16 xl:min-w-48 w-4 mt-4">
       {#each navigation_items as item}
         <NavItemLargeScreen information={item}></NavItemLargeScreen>
       {/each}
