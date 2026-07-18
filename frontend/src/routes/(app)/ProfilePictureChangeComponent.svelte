@@ -138,7 +138,7 @@
     {#if image}
       <div class="relative w-full h-80 my-1">
         <Cropper
-          {image}
+          image={image as string}
           oncropcomplete={(e) => {
             crop_area = e.pixels;
           }}
@@ -153,7 +153,7 @@
         onclick={async () => {
           error = "";
           loading = true;
-          const cropped_image = await getCroppedImg(image, crop_area);
+          const cropped_image = await getCroppedImg(image as string, crop_area);
           const result = await update_user_profile_photo(
             cropped_image!,
             $token_information.a,

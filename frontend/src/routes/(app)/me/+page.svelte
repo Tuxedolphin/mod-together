@@ -26,6 +26,7 @@
 
   let loading = $state(false);
   let confirm_delete = $state("");
+  // svelte-ignore non_reactive_update
   let change_image_dialog: HTMLDialogElement;
 
   let delete_error = $state("");

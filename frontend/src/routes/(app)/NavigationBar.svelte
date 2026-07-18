@@ -1,5 +1,4 @@
 <script lang="ts">
-
   import {
     Calendar1,
     Home,
@@ -40,14 +39,18 @@
       <label for="main-drawer" aria-label="open sidebar">
         <!-- <Menu></Menu> -->
       </label>
-      <enhanced:img
+      <button
+        aria-label="Mods Together Logo"
         onclick={() => {
           goto(resolve("/(app)/home"));
         }}
-        class="aspect-5/2 h-14 w-auto align-middle"
-        src={mods_tgt_header}
-        alt="Mods Together Logo"
-      />
+      >
+        <enhanced:img
+          class="aspect-5/2 h-14 w-auto align-middle"
+          src={mods_tgt_header}
+          alt="Mods Together Logo"
+        />
+      </button>
     </div>
 
     <div class="flex items-center gap-1">

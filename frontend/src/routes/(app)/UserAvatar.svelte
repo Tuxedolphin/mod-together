@@ -18,6 +18,7 @@
 
   let { size = 40 } = $props();
 
+  // svelte-ignore non_reactive_update
   let change_image_dialog: HTMLDialogElement;
 </script>
 

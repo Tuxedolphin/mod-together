@@ -10,7 +10,7 @@
     style="width: {size}px;"
   >
     {#if $currentUserInformation.avatarUrl}
-      <img src={$currentUserInformation.avatarUrl} />
+      <img alt="User Avatar" src={$currentUserInformation.avatarUrl} />
     {:else}
       <span class="text-3xl">{$currentUserInformation.username?.charAt(0)}</span
       >
