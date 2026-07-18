@@ -17,13 +17,15 @@
   // svelte-ignore non_reactive_update
   let dialog: HTMLDialogElement;
 
+  let { size = 40 } = $props();
+
   let change_image_dialog: HTMLDialogElement;
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div onclick={() => dialog.show()}>
-  <UserAvatarComponent size={48}></UserAvatarComponent>
+  <UserAvatarComponent {size}></UserAvatarComponent>
 </div>
 
 <GenericDialog
