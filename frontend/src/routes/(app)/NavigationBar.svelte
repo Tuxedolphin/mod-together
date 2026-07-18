@@ -15,7 +15,7 @@
   <div class="container flex justify-between mx-auto">
     <div class="flex items-center">
       <label for="main-drawer" aria-label="open sidebar">
-        <Menu></Menu>
+        <!-- <Menu></Menu> -->
       </label>
       <enhanced:img
         class="aspect-5/2 h-14 w-auto align-middle"
