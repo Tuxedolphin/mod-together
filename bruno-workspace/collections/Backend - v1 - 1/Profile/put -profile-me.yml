@@ -12,7 +12,6 @@ http:
     type: json
     data: |-
       {
-        "userId": "{{userId}}",
         "username": "{{username}}",
         "handle": "{{handle}}"
       }
@@ -25,8 +24,8 @@ settings:
   maxRedirects: 5
 
 examples:
-  - name: 204 Response
-    description: No Content
+  - name: 204 Profile updated
+    description: Username and handle were updated for the authenticated user.
     request:
       url: "{{baseUrl}}/profile/me"
       method: PUT
@@ -34,13 +33,9 @@ examples:
         type: json
         data: |-
           {
-            "userId": "00000000-0000-0000-0000-000000000000",
-            "username": "Test User",
-            "handle": "test-user"
+            "username": "Ada Lovelace",
+            "handle": "ada-lovelace"
           }
     response:
       status: 204
       statusText: No Content
-      body:
-        type: text
-        data: ""

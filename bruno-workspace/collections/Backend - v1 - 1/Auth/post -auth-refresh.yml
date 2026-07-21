@@ -14,17 +14,17 @@ http:
       {
         "refreshToken": "{{refreshToken}}"
       }
+  auth: none
 
 runtime:
-  variables:
-    - name: baseUrl
-      value: http://localhost:5233
   scripts:
     - type: after-response
       code: |-
         const data = res.getBody();
-        bru.setEnvVar("accessToken", data.accessToken, { persist: false });
-        bru.setEnvVar("refreshToken", data.refreshToken, { persist: false });
+        if (res.getStatus() === 200 && data.accessToken && data.refreshToken) {
+          bru.setEnvVar("accessToken", data.accessToken, { persist: false });
+          bru.setEnvVar("refreshToken", data.refreshToken, { persist: false });
+        }
 
 settings:
   encodeUrl: true
@@ -33,8 +33,8 @@ settings:
   maxRedirects: 5
 
 examples:
-  - name: 200 Response
-    description: OK
+  - name: 200 Tokens refreshed
+    description: Returns a rotated access and refresh token pair.
     request:
       url: "{{baseUrl}}/auth/refresh"
       method: POST
@@ -42,33 +42,7 @@ examples:
         type: json
         data: |-
           {
-            "refreshToken": ""
-          }
-    response:
-      status: 200
-      statusText: OK
-      headers:
-        - name: Content-Type
-          value: text/plain
-      body:
-        type: text
-        data: |-
-          {
-            "accessToken": "",
-            "refreshToken": "",
-            "expiresIn": "",
-            "tokenType": ""
-          }
-  - name: 200 Response
-    description: OK
-    request:
-      url: "{{baseUrl}}/auth/refresh"
-      method: POST
-      body:
-        type: json
-        data: |-
-          {
-            "refreshToken": ""
+            "refreshToken": "example-refresh-token"
           }
     response:
       status: 200
@@ -80,34 +54,8 @@ examples:
         type: json
         data: |-
           {
-            "accessToken": "",
-            "refreshToken": "",
-            "expiresIn": "",
-            "tokenType": ""
-          }
-  - name: 200 Response
-    description: OK
-    request:
-      url: "{{baseUrl}}/auth/refresh"
-      method: POST
-      body:
-        type: json
-        data: |-
-          {
-            "refreshToken": ""
-          }
-    response:
-      status: 200
-      statusText: OK
-      headers:
-        - name: Content-Type
-          value: text/json
-      body:
-        type: json
-        data: |-
-          {
-            "accessToken": "",
-            "refreshToken": "",
-            "expiresIn": "",
-            "tokenType": ""
+            "accessToken": "eyJhbGciOiJIUzI1NiJ9.rotated-access-token",
+            "refreshToken": "rotated-refresh-token",
+            "expiresIn": 3600,
+            "tokenType": "bearer"
           }

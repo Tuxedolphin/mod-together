@@ -20,7 +20,7 @@ examples:
   - name: 200 Available Response
     description: Handle is available
     request:
-      url: "{{baseUrl}}/profile/check-handle?handle=test-user"
+      url: "{{baseUrl}}/profile/check-handle?handle=grace-hopper"
       method: GET
     response:
       status: 200
@@ -34,7 +34,8 @@ examples:
         type: json
         data: |-
           {
-            "available": true
+            "available": true,
+            "reason": null
           }
   - name: 200 Unavailable Response
     description: Handle is already taken
