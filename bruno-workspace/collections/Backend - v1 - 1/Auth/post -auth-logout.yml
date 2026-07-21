@@ -17,14 +17,11 @@ settings:
   maxRedirects: 5
 
 examples:
-  - name: 200 Response
-    description: OK
+  - name: 204 Logged out
+    description: The current session was revoked.
     request:
       url: "{{baseUrl}}/auth/logout"
       method: POST
     response:
-      status: 200
-      statusText: OK
-      body:
-        type: text
-        data: ""
+      status: 204
+      statusText: No Content

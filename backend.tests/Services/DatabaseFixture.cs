@@ -50,7 +50,9 @@ public class DatabaseFixture : IAsyncLifetime
                 "Id" uuid PRIMARY KEY,
                 "Username" text,
                 "Handle" text,
-                "AvatarUpdatedAt" timestamp with time zone
+                "AvatarUpdatedAt" timestamp with time zone,
+                "Colour" text,
+                "DefaultTheme" text
             );
             CREATE UNIQUE INDEX IF NOT EXISTS "IX_Profiles_Handle"
                 ON public."Profiles" ("Handle");

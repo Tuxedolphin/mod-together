@@ -13,7 +13,9 @@ public class TimetableController(ITimetableService service) : BaseController
     private readonly ITimetableService _service = service;
 
     [HttpPost]
-    public async Task<IActionResult> CreateTimetableAsync([FromBody] CreateTimetableRequest request)
+    public async Task<ActionResult<TimetableResponse>> CreateTimetable(
+        [FromBody] CreateTimetableRequest request
+    )
     {
         TimetableResponse timetable = await _service.CreateTimetableAsync(request, GetUserId());
 
@@ -29,7 +31,7 @@ public class TimetableController(ITimetableService service) : BaseController
     }
 
     [HttpGet]
-    public async Task<ActionResult<TimetableSummaryResponse>> GetTimetablesAsync()
+    public async Task<ActionResult<List<TimetableSummaryResponse>>> GetTimetables()
     {
         var timetables = await _service.GetTimetablesAsync(GetUserId());
         return Ok(timetables);

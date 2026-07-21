@@ -1,0 +1,41 @@
+info:
+  name: put /profile/me/customisation
+  type: http
+  seq: 4
+  tags:
+    - Profile
+
+http:
+  method: PUT
+  url: "{{baseUrl}}/profile/me/customisation"
+  body:
+    type: json
+    data: |-
+      {
+        "colour": "{{colour}}",
+        "defaultTheme": "{{defaultTheme}}"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 204 Customisation updated
+    description: Colour and default theme were updated for the authenticated user.
+    request:
+      url: "{{baseUrl}}/profile/me/customisation"
+      method: PUT
+      body:
+        type: json
+        data: |-
+          {
+            "colour": "#FF5733",
+            "defaultTheme": "dark"
+          }
+    response:
+      status: 204
+      statusText: No Content
