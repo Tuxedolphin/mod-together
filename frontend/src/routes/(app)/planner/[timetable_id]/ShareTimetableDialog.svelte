@@ -3,32 +3,44 @@
   import { currentUserInformation } from "$lib/shared/shared.svelte";
   import type {
     Profile,
+    RoomInformation,
     RoomProfile,
     RoomRole,
+    RoomVisibility,
     TimetableResponse,
   } from "$lib/types/db_raw_types";
-  import { format_room_role_to_string } from "$lib/utils/frontend_utils";
+  import {
+    format_room_role_to_string,
+    format_room_visibility_to_string,
+    get_room_visibility_description,
+  } from "$lib/utils/frontend_utils";
   import { debounce } from "es-toolkit";
   import GenericDialog from "../../GenericDialog.svelte";
   import { roomHub } from "$lib/stores/roomHub";
-  import { Check, ChevronDown, Edit2 } from "@lucide/svelte";
+  import { Check, ChevronDown, Edit2, Pencil } from "@lucide/svelte";
+  import { onMount } from "svelte";
 
   let copy_text = $state("Copy Link!");
   let handle_name = $state("");
   let user_handle_results = $state([] as FrontendProfile[]);
   let popover_list = $state([] as HTMLUListElement[]);
+  let visibility_popover: HTMLUListElement;
   interface FrontendProfile extends Profile {
     loading: boolean;
   }
 
   interface ShareTimetableDialogProps {
     timetable_metadata: TimetableResponse;
+    room_visibility: RoomVisibility;
+    base_timetable_id: string;
     profiles: RoomProfile[];
     share_tt_dialog: HTMLDialogElement;
   }
   let {
     timetable_metadata,
     profiles,
+    base_timetable_id,
+    room_visibility,
     share_tt_dialog = $bindable(),
   }: ShareTimetableDialogProps = $props();
 
@@ -38,15 +50,34 @@
     on_failure: () => void,
     on_success: (result: Profile[]) => void,
   ) {
+    console.log(timetable_metadata);
     try {
       const result = (await $roomHub?.invoke(
         "SetMemberRole",
         handle,
-        timetable_metadata.id,
+        base_timetable_id,
         role,
       )) as Profile[];
 
       on_success(result);
+    } catch {
+      on_failure();
+    }
+  }
+
+  async function change_visibility(
+    visibility: RoomVisibility,
+    on_failure: () => void,
+    on_success: () => void,
+  ) {
+    try {
+      const result = await $roomHub?.invoke(
+        "UpdateRoomVisibility",
+        base_timetable_id,
+        visibility,
+      );
+
+      on_success();
     } catch {
       on_failure();
     }
@@ -61,7 +92,7 @@
       const result = (await $roomHub?.invoke(
         "RevokeMemberAccess",
         handle,
-        timetable_metadata.id,
+        base_timetable_id,
       )) as Profile[];
 
       on_success(result);
@@ -71,10 +102,11 @@
   }
 
   const search_for_member = debounce(async (handle: string) => {
+    console.log(timetable_metadata);
     const result = await $roomHub?.invoke(
       "FindUsersByHandle",
       handle,
-      timetable_metadata.id,
+      base_timetable_id,
     );
     user_handle_results = result;
     for (let i = 0; i < user_handle_results.length; i++) {
@@ -94,7 +126,7 @@
     <input
       type="text"
       id="name"
-      class="input"
+      class="input w-full"
       placeholder="Name"
       bind:value={handle_name}
       oninput={(new_text) => {
@@ -240,7 +272,63 @@
       </li>
     {/each}
   </ul>
+  <h1 class=" font-bold">General Access Settings:</h1>
+  <ul class="list bg-base-100 rounded-box shadow-md overflow-auto max-h-28">
+    <li class="list-row">
+      <ul
+        class="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
+        popover
+        id="p-visibility"
+        style="position-anchor:--a-visibility"
+        bind:this={visibility_popover}
+      >
+        {#each ["publicView", "publicEdit", "restricted"] as visibility}
+          <li>
+            <a
+              class="flex justify-between"
+              onclick={async () => {
+                change_visibility(
+                  visibility as RoomVisibility,
+                  () => {
+                    visibility_popover.hidePopover();
+                  },
+                  () => {
+                    visibility_popover.hidePopover();
+                  },
+                );
+              }}
+            >
+              <div>
+                {format_room_visibility_to_string(visibility as RoomVisibility)}
+              </div>
+              {#if visibility === room_visibility}
+                <Check></Check>
+              {/if}
+            </a>
+          </li>
+        {/each}
+      </ul>
+      <div></div>
+      <div>
+        <div>
+          {format_room_visibility_to_string(room_visibility)}
+        </div>
+        <div class="text-xs font-semibold opacity-60">
+          {get_room_visibility_description(room_visibility)}
+        </div>
+      </div>
 
+      <div>
+        <button
+          class="btn rounded-full btn-secondary"
+          popovertarget="p-visibility"
+          style="anchor-name:--a-visibility"
+        >
+          <Pencil></Pencil>
+        </button>
+      </div>
+    </li>
+  </ul>
   <button
     class="btn w-full btn-primary"
     onclick={async () => {

@@ -1,4 +1,5 @@
 export type RoomRole = "owner" | "editor" | "viewer";
+export type RoomVisibility = "publicView" | "publicEdit" | "restricted";
 
 export interface AuthResponse {
   accessToken: string;
@@ -75,6 +76,7 @@ export interface RoomInformation {
   roomId: string;
   members: RoomProfile[];
   timetables: TimetableDetailedResponse[];
+  visibility: RoomVisibility;
 }
 
 export interface TimetableDetailedResponse extends TimetableResponse {

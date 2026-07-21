@@ -1,7 +1,7 @@
 import { debounce } from "es-toolkit";
 import { Err, Ok, Result } from "ts-results-es";
 import { check_handle } from "./db_operations";
-import type { RoomRole } from "$lib/types/db_raw_types";
+import type { RoomRole, RoomVisibility } from "$lib/types/db_raw_types";
 
 export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -13,6 +13,32 @@ export function json_tryparse<T>(text: string): Result<T, string> {
   } catch {
     return Err(text);
   }
+}
+
+export function get_room_visibility_description(role: RoomVisibility): string {
+  switch (role) {
+    case "publicEdit":
+      return "Allow anyone with a ModsTgt account to add their timetable";
+    case "publicView":
+      return "Allow anyone with a ModsTgt account to view this timetable";
+    case "restricted":
+      return "Only allow those on the list above to access this timetable";
+  }
+
+  return "Invalid";
+}
+
+export function format_room_visibility_to_string(role: RoomVisibility): string {
+  switch (role) {
+    case "publicEdit":
+      return "Editable by anyone";
+    case "publicView":
+      return "Viewable by anyone";
+    case "restricted":
+      return "Restricted";
+  }
+
+  return "Invalid";
 }
 
 export function format_room_role_to_string(role: RoomRole): string {
