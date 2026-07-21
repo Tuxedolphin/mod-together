@@ -8,7 +8,7 @@ info:
 http:
   method: GET
   url: "{{baseUrl}}/health"
-  auth: inherit
+  auth: none
 
 settings:
   encodeUrl: true
@@ -17,14 +17,39 @@ settings:
   maxRedirects: 5
 
 examples:
-  - name: 200 Response
-    description: OK
+  - name: 200 Healthy
+    description: The API and database connection are healthy.
     request:
       url: "{{baseUrl}}/health"
       method: GET
     response:
       status: 200
       statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
       body:
-        type: text
-        data: ""
+        type: json
+        data: |-
+          {
+            "status": "Healthy!",
+            "database": "Connected"
+          }
+  - name: 503 Database unavailable
+    description: The API is running but could not connect to the database.
+    request:
+      url: "{{baseUrl}}/health"
+      method: GET
+    response:
+      status: 503
+      statusText: Service Unavailable
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "status": "Unhealthy",
+            "database": "Not Connected"
+          }

@@ -46,7 +46,14 @@ public class TimetableMappingsTests
         };
 
     private static ProfileResponse MakeProfileResponse() =>
-        new(Guid.NewGuid(), "testuser", "testhandle", "https://avatars.test/avatar.webp");
+        new(
+            Guid.NewGuid(),
+            "testuser",
+            "testhandle",
+            "#3B82F6",
+            "dark",
+            "https://avatars.test/avatar.webp"
+        );
 
     private static UpdateTimetableRequest MakeUpdateRequest() =>
         new() { Name = "Updated Timetable", MetaData = [MakeModule(), MakeModule()] };

@@ -1,7 +1,7 @@
 info:
   name: delete /profile/avatar
   type: http
-  seq: 5
+  seq: 6
   tags:
     - Profile
 
@@ -17,14 +17,11 @@ settings:
   maxRedirects: 5
 
 examples:
-  - name: 204 Response
-    description: No Content
+  - name: 204 Avatar deleted
+    description: The avatar was removed, or no avatar was present.
     request:
       url: "{{baseUrl}}/profile/avatar"
       method: DELETE
     response:
       status: 204
       statusText: No Content
-      body:
-        type: text
-        data: ""

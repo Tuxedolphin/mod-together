@@ -1,7 +1,7 @@
 info:
   name: delete /profile/me
   type: http
-  seq: 6
+  seq: 7
   tags:
     - Profile
 
@@ -17,14 +17,11 @@ settings:
   maxRedirects: 5
 
 examples:
-  - name: 204 Response
-    description: No Content
+  - name: 204 Profile deleted
+    description: The authenticated user's profile and auth account were deleted.
     request:
       url: "{{baseUrl}}/profile/me"
       method: DELETE
     response:
       status: 204
       statusText: No Content
-      body:
-        type: text
-        data: ""
