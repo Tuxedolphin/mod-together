@@ -197,6 +197,9 @@
             semester={timetable_metadata.semester}
           ></DaysOfWeekHeader>
           <TimetableComponent
+            room_profiles={profiles}
+            {visibility}
+            timetable_name={timetable_metadata.name}
             timetables={currentTimetableDisplay}
             acadYear={timetable_metadata.academicYear}
             semester={timetable_metadata.semester}
