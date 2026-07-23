@@ -1,7 +1,7 @@
 <script lang="ts">
   import { AllSubstringsIndexStrategy, Search } from "js-search";
   import { onDestroy, onMount } from "svelte";
-  import { searchTerm } from "$lib/shared/shared.svelte";
+
   import type { ModSummary } from "$lib/types/mod_summaries";
   import { getListOfModsSummary } from "$lib/utils/fetch_from_cache";
   import ModuleCodeSuggestionMini from "./ModuleCodeSuggestionMini.svelte";
@@ -67,6 +67,7 @@
 <div class="max-h-36 overflow-auto scroll-auto">
   {#each results as res (res.moduleCode)}
     <ModuleCodeSuggestionMini
+      bind:search_term
       user_favourite_colour={user_favourite_color}
       {timetable_name}
       {timetable_id}

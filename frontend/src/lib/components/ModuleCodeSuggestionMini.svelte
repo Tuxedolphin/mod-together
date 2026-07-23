@@ -1,14 +1,8 @@
 <script lang="ts">
-  import {
-    currentlySelectedMods,
-    currentUserInformation,
-    searchTerm,
-    token_information,
-  } from "$lib/shared/shared.svelte";
+  import { currentlySelectedMods } from "$lib/shared/shared.svelte";
   import { roomHub } from "$lib/stores/roomHub";
   import type { TimetablePostTemplate } from "$lib/types/db_raw_types";
   import type { ModSummary } from "$lib/types/mod_summaries";
-  import { create_empty_timetable } from "$lib/utils/db_operations";
   import { getFullModInfo } from "$lib/utils/fetch_from_cache";
   import {
     checkModAlreadyAdded,
@@ -23,6 +17,7 @@
     timetable_id: string | undefined;
     timetable_name: string;
     user_favourite_colour: string;
+    search_term: string;
   }
 
   let {
@@ -32,6 +27,7 @@
     timetable_id,
     timetable_name,
     user_favourite_colour,
+    search_term = $bindable(),
   }: ModSuggestionsProp = $props();
 
   async function addMod() {
@@ -84,6 +80,8 @@
       Name: timetable_name,
       MetaData: new_data,
     });
+
+    search_term = "";
   }
 </script>
 

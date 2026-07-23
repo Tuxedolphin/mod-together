@@ -52,8 +52,6 @@ export const chooseModState = writable({
   selectedTimetableId: "",
 } as LessonInfo);
 
-export const searchTerm = writable("");
-
 export interface LessonInfo {
   moduleCode: string;
   lessonType: string;
