@@ -13,6 +13,7 @@
     checkModAlreadyAdded,
     createModEntry,
   } from "$lib/utils/format_db_information";
+  import { get } from "svelte/store";
 
   interface ModSuggestionsProp {
     mod: ModSummary;
@@ -71,7 +72,14 @@
       ),
     );
 
-    searchTerm.set("");
+    const new_data = get(currentlySelectedMods).find(
+      (x) => x.id === timetable_id,
+    )!.metaData;
+
+    await $roomHub?.invoke("UpdateTimetable", timetable_id, {
+      Name: timetable_name,
+      MetaData: new_data,
+    });
   }
 </script>
 

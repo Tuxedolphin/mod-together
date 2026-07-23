@@ -17,7 +17,7 @@
   let modData = $state([]) as ModSummary[];
   let loading = $state(false);
   const modSearch = new Search("moduleCode");
-
+  let search_term = $state("");
   onMount(async () => {
     loading = true;
     modData = await getListOfModsSummary(acadYear);
@@ -29,16 +29,16 @@
   });
 
   let results = $derived(
-    $searchTerm.length < 3
+    search_term.length < 3
       ? []
       : // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (modSearch.search($searchTerm) as ModSummary[]).sort((a, _) =>
+        (modSearch.search(search_term) as ModSummary[]).sort((a, _) =>
           a.semesters.includes(semester) ? -1 : 1,
         ),
   );
 
   onDestroy(() => {
-    searchTerm.set("");
+    search_term = "";
   });
 </script>
 
@@ -54,7 +54,7 @@
     type="text"
     placeholder="Enter Module Code or Module Name..."
     class="input w-full input-primary"
-    bind:value={$searchTerm}
+    bind:value={search_term}
   />
 {/if}
 

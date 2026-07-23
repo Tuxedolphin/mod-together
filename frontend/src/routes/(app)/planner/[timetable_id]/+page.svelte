@@ -131,11 +131,7 @@
           }
 
           for (const timetable of updated_timetable) {
-            if (timetable.profile.userId !== user_tt?.profile.userId) continue;
-            await $roomHub?.invoke("UpdateTimetable", timetable.id, {
-              Name: timetable.name,
-              MetaData: timetable.metaData,
-            });
+            // if (timetable.profile.userId !== user_tt?.profile.userId) continue;
           }
         },
       );

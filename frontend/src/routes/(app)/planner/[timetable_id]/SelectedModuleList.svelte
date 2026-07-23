@@ -1,14 +1,17 @@
 <script lang="ts">
   import { currentlySelectedMods } from "$lib/shared/shared.svelte";
+  import { roomHub } from "$lib/stores/roomHub";
   import { getFullModInfo } from "$lib/utils/fetch_from_cache";
   import { removeModEntry } from "$lib/utils/format_db_information";
   import { X } from "@lucide/svelte";
   import { groupBy } from "es-toolkit";
+  import { get } from "svelte/store";
 
   interface ModsSelectionComponentProps {
     acadYear: string;
     semester: number;
     timetable_id: string | undefined;
+    timetable_name: string;
   }
 
   let mods_list = $derived(
@@ -18,8 +21,12 @@
     ),
   );
 
-  let { timetable_id, acadYear, semester }: ModsSelectionComponentProps =
-    $props();
+  let {
+    timetable_id,
+    acadYear,
+    semester,
+    timetable_name,
+  }: ModsSelectionComponentProps = $props();
 </script>
 
 <!-- Mods List -->
@@ -48,6 +55,15 @@
               mods[0],
             ),
           );
+
+          const new_data = get(currentlySelectedMods).find(
+            (x) => x.id === timetable_id,
+          )!.metaData;
+
+          await $roomHub?.invoke("UpdateTimetable", timetable_id, {
+            Name: timetable_name,
+            MetaData: new_data,
+          });
         }}
       >
         <X></X>
