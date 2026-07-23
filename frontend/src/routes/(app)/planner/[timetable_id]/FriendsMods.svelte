@@ -30,6 +30,7 @@
 
 {#each friends_mods as mods}
   <ModsSelectionComponent
+    user_favourite_color={mods.profile.colour!}
     is_friend={true}
     acadYear={mods.academicYear}
     semester={mods.semester}

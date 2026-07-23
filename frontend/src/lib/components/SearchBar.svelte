@@ -11,9 +11,15 @@
     semester: number;
     timetable_id: string | undefined;
     timetable_name: string;
+    user_favourite_color: string;
   }
-  const { acadYear, semester, timetable_id, timetable_name }: SearchBarProps =
-    $props();
+  const {
+    acadYear,
+    semester,
+    timetable_id,
+    timetable_name,
+    user_favourite_color,
+  }: SearchBarProps = $props();
   let modData = $state([]) as ModSummary[];
   let loading = $state(false);
   const modSearch = new Search("moduleCode");
@@ -61,6 +67,7 @@
 <div class="max-h-36 overflow-auto scroll-auto">
   {#each results as res (res.moduleCode)}
     <ModuleCodeSuggestionMini
+      user_favourite_colour={user_favourite_color}
       {timetable_name}
       {timetable_id}
       mod={res}

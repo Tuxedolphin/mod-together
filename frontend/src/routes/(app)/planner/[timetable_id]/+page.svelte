@@ -61,10 +61,6 @@
   // svelte-ignore non_reactive_update
   let user_tt: TimetableDetailedResponse | undefined = $state();
 
-  let user_perms: RoomProfile = $derived(
-    profiles.find((x) => x.userId == $currentUserInformation.userId),
-  );
-
   let room_information: RoomInformation | undefined = $state();
   let visibility: RoomVisibility = $state("restricted");
   let error = $state("");
@@ -211,6 +207,8 @@
       <!-- This is the module seleciton view (your own) -->
       <div class="md:w-[25%] px-4">
         <ModsSelectionComponent
+          is_friend={false}
+          user_favourite_color={$currentUserInformation.colour!}
           timetable_name={timetable_metadata.name}
           {visibility}
           acadYear={timetable_metadata.academicYear}

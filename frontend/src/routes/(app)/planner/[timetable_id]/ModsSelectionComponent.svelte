@@ -18,6 +18,7 @@
     visibility: RoomVisibility;
     timetable_name: string;
     is_friend: boolean;
+    user_favourite_color: string;
   }
 
   let {
@@ -26,6 +27,7 @@
     timetable_id,
     visibility,
     timetable_name,
+    user_favourite_color,
     is_friend = false,
   }: ModsSelectionComponentProps = $props();
 
@@ -42,10 +44,22 @@
     @{user_info.profile.handle}'s Mod List:
   {:else}
     Your Mods List:{/if}
-  <SearchBar {timetable_name} {acadYear} {semester} {timetable_id}></SearchBar>
+  <SearchBar
+    {user_favourite_color}
+    {timetable_name}
+    {acadYear}
+    {semester}
+    {timetable_id}
+  ></SearchBar>
 {:else}
   <div class="text-xl">Your Mods:</div>
-  <SearchBar {timetable_name} {acadYear} {semester} {timetable_id}></SearchBar>
+  <SearchBar
+    {user_favourite_color}
+    {timetable_name}
+    {acadYear}
+    {semester}
+    {timetable_id}
+  ></SearchBar>
 {/if}
 
 {#if selected_user_mods_list.length !== 0}
@@ -56,6 +70,7 @@
   {#if !is_friend}
     <div class="flex text-center flex-col">
       <ImportFromNusModsButton
+        user_favourite_colour={user_favourite_color}
         acad_year={acadYear}
         {semester}
         current_timetable_id={timetable_id}

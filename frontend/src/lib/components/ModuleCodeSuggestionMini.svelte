@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     currentlySelectedMods,
+    currentUserInformation,
     searchTerm,
     token_information,
   } from "$lib/shared/shared.svelte";
@@ -21,6 +22,7 @@
     acadYear: string;
     timetable_id: string | undefined;
     timetable_name: string;
+    user_favourite_colour: string;
   }
 
   let {
@@ -29,6 +31,7 @@
     acadYear,
     timetable_id,
     timetable_name,
+    user_favourite_colour,
   }: ModSuggestionsProp = $props();
 
   async function addMod() {
@@ -56,7 +59,7 @@
         $currentlySelectedMods,
         acadYear,
         semester,
-        timetable_id,
+        timetable_id!,
         mod.moduleCode,
       )
     )
@@ -66,9 +69,10 @@
         $currentlySelectedMods,
         acadYear,
         semester,
-        timetable_id,
+        timetable_id!,
         modFullInfo.moduleCode,
         timeTable,
+        user_favourite_colour,
       ),
     );
 

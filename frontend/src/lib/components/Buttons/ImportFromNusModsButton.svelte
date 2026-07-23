@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { token_information } from "$lib/shared/shared.svelte";
+  import {
+    currentUserInformation,
+    token_information,
+  } from "$lib/shared/shared.svelte";
   import { roomHub } from "$lib/stores/roomHub";
   import type {
     TimetableInfos,
@@ -18,6 +21,7 @@
     semester: number;
     current_timetable_id: string | undefined;
     timetable_name: string;
+    user_favourite_colour: string;
   }
 
   // svelte-ignore non_reactive_update
@@ -32,6 +36,7 @@
     current_timetable_id,
     timetable_name,
     semester,
+    user_favourite_colour,
   }: AddFromOtherTimetablesButtonProps = $props();
 
   function reset() {
@@ -68,7 +73,10 @@
       <button
         class="btn btn-primary"
         onclick={async () => {
-          const parsed_result = parse_mods_link(share_link);
+          const parsed_result = parse_mods_link(
+            share_link,
+            user_favourite_colour,
+          );
 
           if (second_click && parsed_result.isOk()) {
             const { mods_info } = parsed_result.value;

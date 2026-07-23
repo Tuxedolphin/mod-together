@@ -8,7 +8,6 @@ import type { RawLesson } from "$lib/types/modules";
 
 import { normaliseDuration } from "./calculations_for_ui";
 import { getFullModInfo } from "./fetch_from_cache";
-import { get_randomised_colour } from "./formatting_utils";
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 const startOfDayTime = "0800";
@@ -230,6 +229,7 @@ export async function createModEntry(
   id: string,
   moduleCode: string,
   rawLesson: RawLesson[],
+  user_colour: string,
 ): Promise<TimetableDetailedResponse[]> {
   const findTimetableCopy = timetable.filter(
     (x) => x.id == id && x.academicYear == acadYear && x.semester == semesterNo,
@@ -237,7 +237,7 @@ export async function createModEntry(
   const lessonDataRef: TimetableModule[] = [];
 
   const lessonTypes = Object.groupBy(rawLesson, (x) => x.lessonType);
-  const assigned_color = get_randomised_colour(timetable);
+  const assigned_color = user_colour;
   for (const lessonType in lessonTypes) {
     const lesson = lessonTypes[lessonType]![0];
     lessonDataRef.push({
