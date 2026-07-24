@@ -5,8 +5,6 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import DaysOfWeekHeader from "$lib/components/DaysOfWeekHeader.svelte";
-  import ModListGroup from "$lib/components/ModListGroup.svelte";
-  import SearchBar from "$lib/components/SearchBar.svelte";
   import Timeline from "$lib/components/Timeline.svelte";
   import TimetableComponent from "$lib/components/TimetableComponent.svelte";
   import {
@@ -17,12 +15,10 @@
   } from "$lib/shared/shared.svelte";
   import { roomHub } from "$lib/stores/roomHub";
   import type {
-    Profile,
     RoomInformation,
     RoomProfile,
     RoomVisibility,
     TimetableDetailedResponse,
-    TimetablePostTemplate,
     TimetableResponse,
   } from "$lib/types/db_raw_types";
   import { getTimetable } from "$lib/utils/format_db_information";
@@ -30,7 +26,6 @@
     format_AY_name,
     format_semester_name,
   } from "$lib/utils/formatting_utils";
-  import GenericDialog from "../../GenericDialog.svelte";
   import type { PageProps } from "./$types";
   import ShareTimetableDialog from "./ShareTimetableDialog.svelte";
   import ModsSelectionComponent from "./ModsSelectionComponent.svelte";
