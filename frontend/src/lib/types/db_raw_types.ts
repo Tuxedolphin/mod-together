@@ -67,12 +67,18 @@ export interface ErrorInformation {
 
 export type TimetableInfos = TimetableSummaryResponse[];
 
+export type SharedTimetableInfos = SharedTimetableSummaryResponse[];
+
 export interface TimetableSummaryResponse {
   id: string;
   name: string;
   semester: number;
   academicYear: string;
   createdAt: string;
+}
+
+export interface SharedTimetableSummaryResponse extends TimetableSummaryResponse {
+  profile: Profile;
 }
 
 export interface TimetableResponse extends TimetableSummaryResponse {

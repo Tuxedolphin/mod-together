@@ -15,6 +15,7 @@ import type {
   HandleAvailabilityResponse,
   Profile,
   ProfileValidationErrorResponse,
+  SharedTimetableInfos,
   TimetableInfos,
   TimetablePostTemplate,
   TimetableResponse,
@@ -547,7 +548,7 @@ export async function get_user_info(
 
 export async function get_shared_timetables(
   access_token: string,
-): Promise<Result<TimetableInfos, string>> {
+): Promise<Result<SharedTimetableInfos, string>> {
   try {
     const get_timetables_db = create_ky_instance({
       authorised: true,
@@ -556,7 +557,7 @@ export async function get_shared_timetables(
     });
     const timetables = await get_timetables_db
       .get("/timetable/shared")
-      .json<TimetableInfos>();
+      .json<SharedTimetableInfos>();
 
     return Ok(timetables);
   } catch (error) {
