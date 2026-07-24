@@ -611,6 +611,33 @@ public class RoomService(
             new RoomInit(editors, viewers, [.. timetables], room.Visibility)
         );
     }
+
+    public async Task CopyTimetableTo(
+        Guid userId,
+        Guid roomId,
+        Guid timetableId,
+        Guid timetableIdToCopyTo
+    )
+    {
+        var timetableToCopyTo =
+            _roomTracker.GetTimetableById(timetableIdToCopyTo)?.ToTimetable().ToResponse()
+            ?? await _timetableService.GetTimetableByIdAsync(timetableIdToCopyTo, userId);
+
+        var timetable =
+            _roomTracker.GetTimetableById(timetableId)?.ToTimetable().ToResponse()
+            ?? await _timetableService.GetTimetableByIdAsync(timetableId, userId);
+
+        await HandleUpdateTimetableAsync(
+            roomId,
+            userId,
+            timetableIdToCopyTo,
+            new UpdateTimetableRequest
+            {
+                Name = timetableToCopyTo.Name,
+                MetaData = timetable.MetaData,
+            }
+        );
+    }
 }
 
 public enum CreateTimetableResult

@@ -2,7 +2,6 @@ using System.Security.Claims;
 using Backend.DTOs;
 using Backend.Hubs;
 using Backend.Hubs.Clients;
-using Backend.Services.Profiles;
 using Backend.Services.Rooms;
 using Backend.Services.Timetables;
 using Microsoft.AspNetCore.SignalR;
@@ -24,9 +23,7 @@ public class RoomHubTests
 
         await hub.SetMemberRole(memberId, roomId, RoomRole.Viewer);
 
-        await service
-            .Received(1)
-            .SetMemberRoleAsync(roomId, memberId, RoomRole.Viewer, callerId);
+        await service.Received(1).SetMemberRoleAsync(roomId, memberId, RoomRole.Viewer, callerId);
         await roomClient.Received(1).ReceiveRoomMembersUpdate(updatedMembers);
     }
 
@@ -38,20 +35,19 @@ public class RoomHubTests
         var roomId = Guid.NewGuid();
         var updatedMembers = new List<RoomMemberResponse>();
         IReadOnlyCollection<string> removedConnectionIds =
-            ["member-connection-1", "member-connection-2"];
+        [
+            "member-connection-1",
+            "member-connection-2",
+        ];
         var (hub, service, roomClient, groups) = CreateHub(callerId, roomId, updatedMembers);
-        service
-            .RevokeMemberAccessAsync(roomId, memberId, callerId)
-            .Returns(removedConnectionIds);
+        service.RevokeMemberAccessAsync(roomId, memberId, callerId).Returns(removedConnectionIds);
 
         await hub.RevokeMemberAccess(memberId, roomId);
 
         await service.Received(1).RevokeMemberAccessAsync(roomId, memberId, callerId);
         foreach (var connectionId in removedConnectionIds)
         {
-            await groups
-                .Received(1)
-                .RemoveFromGroupAsync(connectionId, roomId.ToString());
+            await groups.Received(1).RemoveFromGroupAsync(connectionId, roomId.ToString());
         }
         await roomClient.Received(1).ReceiveRoomMembersUpdate(updatedMembers);
     }
@@ -61,20 +57,12 @@ public class RoomHubTests
         IRoomService Service,
         IRoomHubClient RoomClient,
         IGroupManager Groups
-    ) CreateHub(
-        Guid callerId,
-        Guid roomId,
-        IReadOnlyCollection<RoomMemberResponse> updatedMembers
-    )
+    ) CreateHub(Guid callerId, Guid roomId, IReadOnlyCollection<RoomMemberResponse> updatedMembers)
     {
         var service = Substitute.For<IRoomService>();
         service.GetRoomMembersAsync(roomId, callerId).Returns(updatedMembers);
 
-        var hub = new RoomHub(
-            NullLogger<RoomHub>.Instance,
-            service,
-            Substitute.For<ITimetableService>()
-        );
+        var hub = new RoomHub(NullLogger<RoomHub>.Instance, service);
         var context = Substitute.For<HubCallerContext>();
         context.ConnectionId.Returns("caller-connection");
         context.User.Returns(
