@@ -1,5 +1,12 @@
 export type RoomRole = "owner" | "editor" | "viewer";
 export type RoomVisibility = "publicView" | "publicEdit" | "restricted";
+export type ThemePreference = "system" | "light" | "dark";
+
+export const available_theme_preferences: ThemePreference[] = [
+  "dark",
+  "light",
+  "system",
+];
 
 export interface AuthResponse {
   accessToken: string;

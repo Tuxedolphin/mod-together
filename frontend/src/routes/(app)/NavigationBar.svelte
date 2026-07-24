@@ -29,7 +29,7 @@
     { icon: Calendar1, title: "Planner", path: "/planner" },
     { icon: Share2, title: "Shared with me", path: "/shared" },
     { icon: UserRound, title: "Profile", path: "/me" },
-    // { icon: Settings2, title: "Settings", path: "/settings" },
+    { icon: Settings2, title: "Settings", path: "/settings" },
   ];
 </script>
 
