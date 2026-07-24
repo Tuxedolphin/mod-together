@@ -426,6 +426,17 @@ public class RoomTracker : IRoomTracker
             ? roomInfo.Timetables.GetValueOrDefault(timetableId)
             : null;
 
+    public RoomTimetable? GetTimetableById(Guid timetableId)
+    {
+        foreach (var roomState in _rooms.Values)
+        {
+            if (roomState.Timetables.TryGetValue(timetableId, out var res))
+                return res;
+        }
+
+        return null;
+    }
+
     public bool TryGetChangedTimetables(
         Guid roomId,
         out IReadOnlyCollection<RoomTimetable> timetables
