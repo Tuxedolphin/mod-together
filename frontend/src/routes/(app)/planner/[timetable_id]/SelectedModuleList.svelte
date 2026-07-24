@@ -22,6 +22,7 @@
     timetable_name: string;
     room_profiles: RoomProfile[];
     visibility: RoomVisibility;
+    is_friend: boolean;
   }
 
   let mods_list = $derived(
@@ -38,6 +39,7 @@
     timetable_name,
     room_profiles,
     visibility,
+    is_friend,
   }: ModsSelectionComponentProps = $props();
 
   let user_current_perms: "annon" | RoomRole = $derived(
@@ -47,20 +49,27 @@
 </script>
 
 <!-- Mods List -->
-<ul class="list bg-base-100 rounded-box shadow-md">
+<ul
+  class="{is_friend
+    ? 'lg:grid-cols-3'
+    : 'lg:grid-cols-1'} grid bg-base-100 rounded-box shadow-md"
+>
   {#each Object.entries(mods_list) as mods, i}
-    <li class="list-row items-center">
-      <div>
-        <button class="btn {mods[1][0].colour} btn-square w-8 h-8"> </button>
+    <li class="flex justify-between items-center p-4">
+      <div class="flex gap-2 items-center">
+        <div>
+          <button class="btn {mods[1][0].colour} btn-square w-8 h-8"> </button>
+        </div>
+        <div>
+          {#await getFullModInfo(mods[0], acadYear) then mod_info}
+            <div>{mod_info.moduleCode}</div>
+            <div class="text-xs uppercase font-semibold opacity-60">
+              {mod_info.title}
+            </div>
+          {/await}
+        </div>
       </div>
-      <div class="list-col-grow">
-        {#await getFullModInfo(mods[0], acadYear) then mod_info}
-          <div>{mod_info.moduleCode}</div>
-          <div class="text-xs uppercase font-semibold opacity-60">
-            {mod_info.title}
-          </div>
-        {/await}
-      </div>
+
       {#if visibility === "publicEdit" || user_current_perms === "owner" || user_current_perms === "editor"}
         <button
           onclick={async () => {

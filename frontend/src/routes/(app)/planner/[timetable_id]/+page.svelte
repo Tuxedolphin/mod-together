@@ -181,8 +181,8 @@
   </div>
   <div class="flex-col flex">
     <!-- This is the main timetable view -->
-    <div class="flex-col md:flex-row flex">
-      <div class="flex flex-1 md:w-[75%]">
+    <div class="flex-col lg:flex-row flex">
+      <div class="flex flex-1 lg:w-[75%]">
         <Timeline></Timeline>
         <div class="flex-1 flex-col">
           <DaysOfWeekHeader
@@ -201,7 +201,7 @@
       </div>
 
       <!-- This is the module seleciton view (your own) -->
-      <div class="md:w-[25%] px-4">
+      <div class="lg:w-[25%] lg:px-2">
         <ModsSelectionComponent
           room_profiles={profiles}
           is_friend={false}
@@ -214,11 +214,13 @@
         ></ModsSelectionComponent>
       </div>
     </div>
-
-    <!-- This is your friend's modules: -->
-    <div>
-      <FriendsMods {visibility} room_profiles={profiles}></FriendsMods>
-    </div>
+    {#if profiles.length > 1}
+      <div class="divider">Friend's Modules</div>
+      <!-- This is your friend's modules: -->
+      <div>
+        <FriendsMods {visibility} room_profiles={profiles}></FriendsMods>
+      </div>
+    {/if}
   </div>
 {/if}
 
