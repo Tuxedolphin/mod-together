@@ -14,6 +14,7 @@
     RoomRole,
     RoomVisibility,
   } from "$lib/types/db_raw_types";
+  import UserAvatarComponent from "$lib/components/Profile/UserAvatarComponent.svelte";
 
   interface ModsSelectionComponentProps {
     acadYear: string;
@@ -52,9 +53,19 @@
 <!-- Logic to Show Searchbar: -->
 <!-- First Layer: Check for tt metadata-->
 {#if is_friend}
-  @{user_info?.profile.handle}'s Mod List:
+  <div class="divider">
+    <div class="flex items-center gap-2">
+      <UserAvatarComponent user_info={user_info?.profile}></UserAvatarComponent>
+      <p>@{user_info?.profile.handle}'s Mod List</p>
+    </div>
+  </div>
 {:else}
-  Your Mod List:
+  <div class="divider">
+    <div class="flex items-center gap-2">
+      <UserAvatarComponent></UserAvatarComponent>
+      <p>Your Mod List</p>
+    </div>
+  </div>
 {/if}
 
 {#if visibility === "publicEdit" || user_current_perms === "owner" || user_current_perms === "editor"}

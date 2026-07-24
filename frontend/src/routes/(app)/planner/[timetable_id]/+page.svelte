@@ -215,12 +215,13 @@
       </div>
     </div>
     {#if profiles.length > 1}
-      <div class="divider">Friend's Modules</div>
       <!-- This is your friend's modules: -->
       <div>
         <FriendsMods {visibility} room_profiles={profiles}></FriendsMods>
       </div>
     {/if}
+
+    <div class="divider"></div>
   </div>
 {/if}
 
