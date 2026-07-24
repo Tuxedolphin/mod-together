@@ -4,22 +4,16 @@ using Backend.Hubs.Clients;
 using Backend.Infrastructure;
 using Backend.Models;
 using Backend.Services.Rooms;
-using Backend.Services.Timetables;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Backend.Hubs;
 
 [Authorize]
-public class RoomHub(
-    ILogger<RoomHub> logger,
-    IRoomService roomService,
-    ITimetableService timetableService
-) : Hub<IRoomHubClient>
+public class RoomHub(ILogger<RoomHub> logger, IRoomService roomService) : Hub<IRoomHubClient>
 {
     private readonly ILogger<RoomHub> _logger = logger;
     private readonly IRoomService _roomService = roomService;
-    private readonly ITimetableService _timetableService = timetableService;
 
     private Guid GetUserId()
     {
@@ -166,26 +160,12 @@ public class RoomHub(
     {
         try
         {
-            var userId = GetUserId();
-            var timetableToCopyTo = await _timetableService.GetTimetableByIdAsync(
-                timetableIdToCopyTo,
-                userId
-            );
-            var timetable = await _timetableService
-                .GetTimetableByIdAsync(timetableId, userId)
-                .MapAsync(t => new UpdateTimetableRequest()
-                {
-                    Name = timetableToCopyTo.Name,
-                    MetaData = t.MetaData,
-                });
-
-            await _roomService.HandleUpdateTimetableAsync(
+            await _roomService.CopyTimetableTo(
+                GetUserId(),
                 GetCurrentRoomId(),
-                userId,
-                timetableIdToCopyTo,
-                timetable
+                timetableId,
+                timetableIdToCopyTo
             );
-
             await SendUpdatedTimetableToGroupAsync(GetCurrentRoomId());
         }
         catch (NotFoundException)
