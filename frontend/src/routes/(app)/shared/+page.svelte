@@ -8,20 +8,21 @@
   import type { TimetableInfos } from "$lib/types/db_raw_types";
   import { get_shared_timetables } from "$lib/utils/db_operations";
   import TimetableList from "./TimetableList.svelte";
-
+  import mods_tgt_peek from "$lib/assets/mods_tgt_peek.png?enhanced";
   let availableTimetables: TimetableInfos = $state([]);
-
+  let loading = $state(false);
   let unsubscribe_from_refresh: Unsubscriber;
   onMount(async () => {
     unsubscribe_from_refresh = timetable_list_should_be_refreshed.subscribe(
       async (should_be_refreshed) => {
         if (!should_be_refreshed) return;
-
+        loading = true;
         const timetable_request = await get_shared_timetables(
           $token_information.a,
         );
         if (timetable_request.isOk()) {
           availableTimetables = [...timetable_request.value];
+          loading = false;
         }
 
         timetable_list_should_be_refreshed.set(false);
@@ -38,9 +39,17 @@
 
 <p class="mt-2 text-xl font-semibold">Shared with me</p>
 <hr class="my-2 h-px border-0 bg-gray-200" />
-
-<TimetableList
-  {availableTimetables}
-  editing_allowed={false}
-  deletion_allowed={false}
-></TimetableList>
+{#if !loading}
+  {#if availableTimetables.length === 0}
+    <div class="flex items-center flex-col">
+      <enhanced:img class="w-64" src={mods_tgt_peek} alt="Mods Together Logo" />
+      <div>Timetables shared with you will appear here!</div>
+    </div>
+  {:else}
+    <TimetableList
+      {availableTimetables}
+      editing_allowed={false}
+      deletion_allowed={false}
+    ></TimetableList>
+  {/if}
+{/if}
